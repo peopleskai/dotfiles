@@ -1,0 +1,45 @@
+# Path to oh-my-zsh installation.
+export ZSH=$HOME/.config/zsh/.oh-my-zsh
+
+# Default editor
+export EDITOR=nvim
+
+# Default language for python
+export LANG="en_US.UTF-8"
+
+# Homebrew
+export PATH="/usr/local/sbin:$PATH"
+
+# setup bash complete
+[[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]] && . "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+
+# setup fzf
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+export FZF_DEFAULT_COMMAND='ag -p=.gitignore -g ""'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# setup pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
+
+echo "testing"
+
+# setup nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+# BEGIN_KITTY_SHELL_INTEGRATION
+if test -n "$KITTY_INSTALLATION_DIR" -a -e "$KITTY_INSTALLATION_DIR/shell-integration/bash/kitty.bash"; then source "$KITTY_INSTALLATION_DIR/shell-integration/bash/kitty.bash"; fi
+# END_KITTY_SHELL_INTEGRATION
+
+# My shortcuts
+alias ll='ls -lG'
+alias setup_cmake_ninja="rm -r cmake-build; cmake -B cmake-build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -DCMAKE_BUILD_TYPE=debug"
+
+LOCAL_SETTING=~/.local_setting
+if [-f "$LOCAL_SETTING"]; then
+    . LOCAL_SETTING
+fi
+. "$HOME/.cargo/env"

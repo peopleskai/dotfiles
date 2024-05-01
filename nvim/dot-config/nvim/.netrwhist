@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/Volumes/workplace/bruce/src/hw-wearable'
+let g:netrw_dirhist_2='/Volumes/workplace/bruce/src/hw-wearable/bruce-app/tst/component/platform_api'
+let g:netrw_dirhist_1='/Volumes/workplace/bruce/src/hw-wearable/common/component/axle_biometric_data/protobuf'
+let g:netrw_dirhist_0='/'
+let g:netrw_dirhist_9='/Volumes/workplace/bruce/src/hw-wearable/CMakeFiles/package.dir'
+let g:netrw_dirhist_8='/'
+let g:netrw_dirhist_7='/Volumes/workplace/bruce/src/hw-wearable/CMakeFiles'
+let g:netrw_dirhist_6='/Volumes/workplace/bruce/src/hw-wearable/cmake-build/bruce-app/CMakeFiles'
+let g:netrw_dirhist_5='/Volumes/workplace/bruce/src/hw-wearable/joni-app/source/config/src'
+let g:netrw_dirhist_4='/Volumes/workplace/bruce/src/hw-wearable/.vim'
