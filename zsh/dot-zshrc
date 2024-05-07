@@ -67,9 +67,9 @@ export ZSH="$HOME/.config/oh-my-zsh"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    git
-    macos
-    fzf
+    fzf-tab # git clone https://github.com/Aloxaf/fzf-tab ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-tab
+    fzf-zsh-plugin # git clone --depth 1 https://github.com/unixorn/fzf-zsh-plugin.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin
+    zsh-autosuggestions # git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -101,29 +101,12 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias setup_cmake_ninja="rm -r cmake-build; cmake -B cmake-build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_TOOLCHAIN_FILE=/Users/yuenton/workplace/bruce/src/HHTCMakeCommon/cmake/BrazilToolchain.cmake -DPLATFORM_TOOLCHAIN=/Users/yuenton/workplace/bruce/src/LocalToolchain.cmake"
 
-# fzf
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# Set up fzf key bindings and fuzzy completion
-eval "$(fzf --zsh)"
-# Setting fd as the default source for fzf
-# export FZF_DEFAULT_COMMAND='fd --type f'
-# To apply the command to CTRL-T as well
-# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# power level 10k theme
+source $HOME/workplace/me/dot-files/zsh/powerlevel10k/powerlevel10k.zsh-theme
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# setup nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-# Local settings
-[ -f ~/.local_settings ] && source ~/.local_settings
-
-# pyenv setup
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # brew setup
 alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
@@ -131,9 +114,53 @@ alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 # zoxide setup
 eval "$(zoxide init zsh)"
 
-# power level 10k theme
-source $HOME/workplace/me/dot-files/zsh/powerlevel10k/powerlevel10k.zsh-theme
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# Replace ls with eza
+alias ls='eza $eza_params'
+alias ll='eza --all --header --long $eza_params'
+alias llm='eza --all --header --long --sort=modified $eza_params'
+alias la='eza -lbhHigUmuSa'
+alias tree='eza --tree $eza_params'
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Replace cat with bat
+alias cat=$(which bat)
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# Enable brew advance preview
+# Requries `brew install exa bat chafa exiftool lesspipe`
+export FZF_PREVIEW_ADVANCED
+
+fzf-git-branch() {
+    git rev-parse HEAD > /dev/null 2>&1 || return
+
+    git branch --color=always --all --sort=-committerdate |
+        grep -v HEAD |
+        fzf --height 50% --ansi --no-multi --preview-window right:65% \
+            --preview 'git log -n 50 --color=always --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed "s/.* //" <<< {})' |
+        sed "s/.* //"
+}
+alias gb='fzf-git-branch'
+
+fzf-git-checkout() {
+    git rev-parse HEAD > /dev/null 2>&1 || return
+
+    local branch
+
+    branch=$(fzf-git-branch)
+    if [[ "$branch" = "" ]]; then
+        echo "No branch selected."
+        return
+    fi
+
+    # If branch name starts with 'remotes/' then it is a remote branch. By
+    # using --track and a remote branch name, it is the same as:
+    # git checkout -b branchName --track origin/branchName
+    if [[ "$branch" = 'remotes/'* ]]; then
+        git checkout --track $branch
+    else
+        git checkout $branch;
+    fi
+}
+alias gco='fzf-git-checkout'
+
+# Local settings
+[ -f ~/.local_zshrc ] && source ~/.local_zshrc
