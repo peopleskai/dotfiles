@@ -223,14 +223,21 @@ return {
       formatters_by_ft = {
         lua = { 'stylua' },
         rust = { 'rustfmt' },
+        sh = { 'shfmt' },
         c = { 'clang-format -i' },
         cpp = { 'clang-format -i' },
+        cmake = { 'cmake_format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
         -- javascript = { { "prettierd", "prettier" } },
+      },
+      formatters = {
+        shfmt = {
+          prepend_args = { '-i', '4', '-ci' },
+        },
       },
     },
   },
