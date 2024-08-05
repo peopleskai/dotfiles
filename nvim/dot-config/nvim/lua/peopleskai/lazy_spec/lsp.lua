@@ -39,7 +39,7 @@ return {
       -- and language tooling communicate in a standardized fashion.
       --
       -- In general, you have a "server" which is some tool built to understand a particular
-      -- language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
+      -- language (such as `gopls`, `lua_ls`, etc.). These Language Servers
       -- (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
       -- processes that communicate with some "client" - in this case, Neovim!
       --
@@ -141,13 +141,14 @@ return {
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local ensure_installed = {
-        'clangd',
-        -- 'gopls',
-        'pyright',
-        'rust-analyzer',
         'lua-language-server',
         'stylua',
+        'clangd',
+        'cmake-language-server',
         'bash-language-server',
+        'json-lsp',
+        'taplo',
+        'rust-analyzer',
       }
       print(dump(ensure_installed))
 
@@ -156,19 +157,6 @@ return {
 
       -- Setup LSP configurations
       require('mason-lspconfig').setup()
-
-      -- Rust Analyzer Config
-      require('lspconfig').rust_analyzer.setup({
-        capabilities = capabilities,
-        settings = {
-          ['rust-analyzer'] = {
-            files = {
-              -- Ignore build folder used for brazil-build
-              -- excludeDirs = { 'build' },
-            },
-          },
-        },
-      })
 
       -- Lua LS Config
       require('lspconfig').lua_ls.setup({
@@ -185,14 +173,58 @@ return {
       })
 
       -- clangd config
-      require('lspconfig').clangd.setup({})
+      require('lspconfig').clangd.setup({
+        cmd = { 'clangd', '--background-index', '--query-driver="/usr/local/bin/arm-none-eabi-gcc"' },
+      })
 
       -- cmake config
       require('lspconfig').cmake.setup({})
 
       -- Bash LS Config
       require('lspconfig').bashls.setup({})
+
+      -- Json LSP
+      require('lspconfig').jsonls.setup({
+        capabilities = capabilities,
+      })
+
+      -- TOML LSP
+      require('lspconfig').taplo.setup({})
+
+      -- Rust Analyzer Config
+      -- require('lspconfig').rust_analyzer.setup({
+      --   capabilities = capabilities,
+      -- })
+      -- require('lspconfig').rust_analyzer.setup({
+      --   capabilities = capabilities,
+      -- settings = {
+      -- ['rust-analyzer'] = {
+      -- cargo = {
+      --   extraEnv = {
+      --     CARGO_PROFILE_RUST_ANALYZER_INHERITS = 'dev',
+      --   },
+      --   extraArgs = { '--profile', 'rust-analyzer' },
+      -- extraArgs = { '--target-dir', 'rust-analyzer-check' },
+      -- targetDir = true,
+      -- },
+      -- check = {
+      --   extraArgs = { '--target-dir', 'target/check' },
+      -- },
+      -- files = {
+      -- Ignore build folder used for brazil-build
+      -- excludeDirs = { 'build' },
+      -- },
+      -- },
+      -- },
+      -- })
     end,
+  },
+
+  -- Rust LSP setup
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^4', -- Recommended
+    lazy = false, -- This plugin is already lazy
   },
 
   { -- Autoformat
@@ -227,6 +259,7 @@ return {
         c = { 'clang-format -i' },
         cpp = { 'clang-format -i' },
         cmake = { 'cmake_format' },
+        toml = { 'taplo' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
