@@ -191,6 +191,9 @@ return {
       -- TOML LSP
       require('lspconfig').taplo.setup({})
 
+      -- Markdown
+      require('lspconfig').marksman.setup({})
+
       -- Rust Analyzer Config
       -- require('lspconfig').rust_analyzer.setup({
       --   capabilities = capabilities,
@@ -260,6 +263,7 @@ return {
         cpp = { 'clang-format -i' },
         cmake = { 'cmake_format' },
         toml = { 'taplo' },
+        markdown = { 'prettier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
