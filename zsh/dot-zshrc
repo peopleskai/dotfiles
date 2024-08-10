@@ -177,4 +177,3 @@ eval "$(starship init zsh)"
 # Local settings
 #
 [ -f ~/.local_zshrc ] && source ~/.local_zshrc
-source /Users/yuenton/.brazil_completion/zsh_completion
