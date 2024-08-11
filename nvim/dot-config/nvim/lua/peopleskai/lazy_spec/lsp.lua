@@ -141,14 +141,22 @@ return {
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local ensure_installed = {
-        'lua-language-server',
-        'stylua',
+        'gersemi',
+        'prettier',
+        'clang-format',
+        'bash-language-server bashls',
         'clangd',
-        'cmake-language-server',
-        'bash-language-server',
-        'json-lsp',
+        'cmake-language-server cmake',
+        'cmakelang',
+        'dart-debug-adapter',
+        'json-lsp jsonls',
+        'lua-language-server lua_ls',
+        'marksman',
+        'pyright',
+        'rust-analyzer rust_analyzer',
+        'shfmt',
+        'stylua',
         'taplo',
-        'rust-analyzer',
       }
       print(dump(ensure_installed))
 
@@ -261,7 +269,7 @@ return {
         sh = { 'shfmt' },
         c = { 'clang-format -i' },
         cpp = { 'clang-format -i' },
-        cmake = { 'cmake_format' },
+        cmake = { 'gersemi' },
         toml = { 'taplo' },
         markdown = { 'prettier' },
         -- Conform can also run multiple formatters sequentially
