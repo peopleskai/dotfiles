@@ -48,7 +48,7 @@ key-mapping.preset = 'qwerty'
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # Mouse lazily follows any focus (window or workspace)
-on-focus-changed = ['move-mouse window-lazy-center']
+# on-focus-changed = ['move-mouse window-lazy-centek']
 
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
@@ -80,15 +80,33 @@ if.app-id = 'com.apple.systempreferences'
 check-further-callbacks = true
 run = 'layout floating'
 
-# Settings App default floating window
+# AppStore App default floating window
 [[on-window-detected]]
 if.app-id = 'com.apple.AppStore'
 check-further-callbacks = true
 run = 'layout floating'
 
-# Settings App default floating window
+# Calculator App default floating window
 [[on-window-detected]]
 if.app-id = 'com.apple.calculator'
+check-further-callbacks = true
+run = 'layout floating'
+
+# Finder App default floating window
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+check-further-callbacks = true
+run = 'layout floating'
+
+# iPhone Simulator floating window
+[[on-window-detected]]
+if.app-id = 'com.apple.iphonesimulator'
+check-further-callbacks = true
+run = 'layout floating'
+
+# iPhone Simulator floating window
+[[on-window-detected]]
+if.app-id = 'com.riotgames.RiotGames.RiotClient'
 check-further-callbacks = true
 run = 'layout floating'
 
