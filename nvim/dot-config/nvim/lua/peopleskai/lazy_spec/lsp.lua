@@ -158,7 +158,6 @@ return {
         'stylua',
         'taplo',
       }
-      print(dump(ensure_installed))
 
       require('mason').setup()
       require('mason-tool-installer').setup({ ensure_installed = ensure_installed })
