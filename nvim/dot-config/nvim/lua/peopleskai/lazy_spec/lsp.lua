@@ -202,6 +202,12 @@ return {
       -- Markdown
       require('lspconfig').marksman.setup({})
 
+      -- Dart
+      require('lspconfig').dartls.setup({})
+
+      -- Typescript
+      require('lspconfig').tsserver.setup({})
+
       -- Rust Analyzer Config
       -- require('lspconfig').rust_analyzer.setup({
       --   capabilities = capabilities,
@@ -272,12 +278,14 @@ return {
         cmake = { 'gersemi' },
         toml = { 'taplo' },
         markdown = { 'prettier' },
+        dart = { 'dart format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { { 'prettierd', 'prettier' } },
+        typescript = { { 'prettierd', 'prettier' } },
       },
       formatters = {
         shfmt = {
