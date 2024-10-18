@@ -8,6 +8,7 @@ return {
   -- git signs
   { 'lewis6991/gitsigns.nvim' },
 
+  -- startup time
   {
     'dstein64/vim-startuptime',
     -- lazy-load on a command
