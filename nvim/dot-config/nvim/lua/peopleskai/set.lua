@@ -1,4 +1,4 @@
--- Set leader
+-- Set leader to <space>
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -17,12 +17,6 @@ vim.o.mouse = 'a'
 
 -- Enable break indent
 vim.opt.breakindent = true
-
--- Replace swap file with undo history
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv('HOME') .. '/.vim/undodir'
-vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
@@ -43,27 +37,22 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 
 -- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
--- Show which line your cursor is on
-vim.opt.cursorline = true
-
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
--- Set highlight on search, but clear on pressing <Esc> in normal mode
+-- Set highlight on search
 vim.opt.hlsearch = true
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- vim.opt.termguicolors = true
-
--- vim.opt.colorcolumn = "100"
+vim.opt.colorcolumn = '100'
 
 -- Set completeopt to have a better completion experience
--- vim.opt.completeopt = { "menu", "menuone", "noselect" }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true

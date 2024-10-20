@@ -2,6 +2,7 @@
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
+-- Keep cursor position when joining lines
 vim.keymap.set('n', 'J', 'mzJ`z')
 
 -- Page up/down while keeping curser in the middle
@@ -31,3 +32,6 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 -- Easy search and replace
 vim.keymap.set('n', '<leader>sr', ':%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>', { desc = '[S]earch and [R]eplace' })
+
+-- <Esc> to unhighlight search in normal mode
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
