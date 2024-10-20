@@ -56,3 +56,5 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Show which line your cursor is on
 vim.opt.cursorline = true
+
+vim.opt.termguicolors = true
