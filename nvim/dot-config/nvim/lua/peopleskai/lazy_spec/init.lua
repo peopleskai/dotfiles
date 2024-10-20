@@ -5,9 +5,6 @@ return {
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
-  -- git signs
-  { 'lewis6991/gitsigns.nvim' },
-
   -- startup time
   {
     'dstein64/vim-startuptime',
