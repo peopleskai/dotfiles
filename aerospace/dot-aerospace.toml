@@ -48,7 +48,7 @@ key-mapping.preset = 'qwerty'
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
 # on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # Mouse lazily follows any focus (window or workspace)
-# on-focus-changed = ['move-mouse window-lazy-centek']
+# on-focus-changed = ['move-mouse window-lazy-center']
 
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
@@ -104,9 +104,27 @@ if.app-id = 'com.apple.iphonesimulator'
 check-further-callbacks = true
 run = 'layout floating'
 
-# iPhone Simulator floating window
+# Riot Games client floating window
 [[on-window-detected]]
 if.app-id = 'com.riotgames.RiotGames.RiotClient'
+check-further-callbacks = true
+run = 'layout floating'
+
+# Notes floating window
+[[on-window-detected]]
+if.app-id = 'com.apple.Notes'
+check-further-callbacks = true
+run = 'layout floating'
+
+# Amazon VPN floating window
+[[on-window-detected]]
+if.app-id = 'com.cisco.anyconnect.gui'
+check-further-callbacks = true
+run = 'layout floating'
+
+# Amazon ACME Client floating window
+[[on-window-detected]]
+if.app-id = 'com.amazon.ACME'
 check-further-callbacks = true
 run = 'layout floating'
 
@@ -151,11 +169,13 @@ alt-shift-k = 'move up'
 alt-shift-l = 'move right'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#resize
-alt-shift-minus = 'resize smart -50'
-alt-shift-equal = 'resize smart +50'
+# alt-shift-minus = 'resize smart -50'
+# alt-shift-equal = 'resize smart +50'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands.html#fullscreen
 alt-shift-enter = 'fullscreen'
+alt-shift-equal = 'balance-sizes'
+alt-shift-minus = 'resize smart 0'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 alt-1 = 'workspace 1'
@@ -205,7 +225,28 @@ f = [
 ] # Toggle between floating and tiling layout
 backspace = ['close-all-windows-but-current', 'mode main']
 
-alt-shift-h = ['join-with left', 'mode main']
-alt-shift-j = ['join-with down', 'mode main']
-alt-shift-k = ['join-with up', 'mode main']
-alt-shift-l = ['join-with right', 'mode main']
+alt-h = ['join-with left', 'mode main']
+alt-j = ['join-with down', 'mode main']
+alt-k = ['join-with up', 'mode main']
+alt-l = ['join-with right', 'mode main']
+
+alt-shift-h = [
+  'join-with left',
+  'layout accordion horizontal vertical',
+  'mode main',
+]
+alt-shift-j = [
+  'join-with down',
+  'layout accordion horizontal vertical',
+  'mode main',
+]
+alt-shift-k = [
+  'join-with up',
+  'layout accordion horizontal vertical',
+  'mode main',
+]
+alt-shift-l = [
+  'join-with right',
+  'layout accordion horizontal vertical',
+  'mode main',
+]
