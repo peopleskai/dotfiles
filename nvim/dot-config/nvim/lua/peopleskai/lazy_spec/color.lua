@@ -1,17 +1,16 @@
 return {
   {
-    'craftzdog/solarized-osaka.nvim',
+    'folke/tokyonight.nvim',
     lazy = false,
     priority = 1000,
+    opts = {},
     config = function()
-      require('solarized-osaka').setup({
-        transparent = true,
-        terminal_colors = true,
-        styles = {
-          floats = 'transparent',
-        },
+      require('tokyonight').setup({
+        transparent = true, -- Enable this to disable setting the background color
+        terminal_colors = true, -- Configure the colors used when opening a `:terminal` in [Neovim](https://github.com/neovim/neovim)
       })
-      vim.cmd([[colorscheme solarized-osaka]])
+
+      vim.cmd([[colorscheme tokyonight]])
     end,
   },
 }
