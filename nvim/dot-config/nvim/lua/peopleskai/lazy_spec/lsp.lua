@@ -167,6 +167,9 @@ return {
         capabilities = capabilities,
       })
 
+      -- Python LSP setup
+      require('lspconfig').pyright.setup({})
+
       -- Custom Rust config to work with Amazon cargo build system
       -- require('lspconfig').rust_analyzer.setup({
       --   capabilities = capabilities,
