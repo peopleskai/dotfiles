@@ -321,4 +321,54 @@ return {
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` typings
+  -- Amazon Brazil Config LSP
+  {
+    url = 'yuenton@git.amazon.com:pkg/NinjaHooks',
+    branch = 'mainline',
+    lazy = false,
+    dependencies = {
+      'neovim/nvim-lspconfig',
+    },
+    cond = function()
+      return os.getenv('WORK_ENV') ~= nil
+    end,
+    config = function(plugin)
+      vim.opt.rtp:prepend(plugin.dir .. '/configuration/vim/amazon/brazil-config')
+      -- Add filetype for Brazil Config files
+      vim.filetype.add({
+        filename = {
+          ['Config'] = function()
+            vim.b.brazil_package_Config = 1
+            return 'brazil-config'
+          end,
+        },
+      })
+      -- Custom barium command to set Brazil project root dir
+      require('lspconfig.configs').barium = {
+        default_config = {
+          cmd = { 'barium' },
+          filetypes = { 'brazil-config' },
+          root_dir = function(fname)
+            return require('lspconfig').util.find_git_ancestor(fname)
+          end,
+          settings = {},
+        },
+      }
+      require('lspconfig').barium.setup({})
+    end,
+  },
+  -- Java LSP for Brazil Java projects
+  {
+    'mfussenegger/nvim-jdtls',
+    dependencies = {
+      'neovim/nvim-lspconfig',
+    },
+    cond = function()
+      return os.getenv('WORK_ENV') ~= nil
+    end,
+    config = function()
+      -- Java LSP setup
+      require('lspconfig').jdtls.setup({})
+    end,
+  },
 }
