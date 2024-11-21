@@ -1,7 +1,11 @@
 #
 # HomeBrew setup
 #
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ ! -f ~/.homebrewrc ]; then
+    echo "No '~/.homebrewrc' found! Setup will not work correctly!!!"
+else
+    source ~/.homebrewrc
+fi
 
 #
 # Oh My Zsh Setup
