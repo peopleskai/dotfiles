@@ -22,15 +22,18 @@ $time\
 style = "fg:#090c0c bg:#a3aed2"
 disabled = false
 [os.symbols]
-Macos = "  "
+Macos = " "
+Linux = " "
+Amazon = " "
+Android = " "
 
 [hostname]
 format = '[$ssh_symbol$hostname]($style)'
 style = "fg:#090c0c bg:#a3aed2"
-ssh_symbol = "<U+EB01> "
+ssh_symbol = " "
 
 [docker_context]
-symbol = " "
+symbol = "  "
 
 [directory]
 style = "fg:#e3e5e5 bg:#769ff0"
