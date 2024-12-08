@@ -112,6 +112,7 @@ return {
         'taplo',
         'isort',
         'black',
+        'typescript-language-server',
       }
 
       require('mason').setup()
