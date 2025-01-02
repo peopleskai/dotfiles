@@ -57,4 +57,20 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
+-- Set terminal color mode
 vim.opt.termguicolors = true
+
+-- Enable local project settings
+vim.opt.exrc = true
+
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}
