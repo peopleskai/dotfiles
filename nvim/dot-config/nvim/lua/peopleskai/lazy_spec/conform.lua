@@ -1,4 +1,6 @@
 return {
+  -- Deprecated, testing guard.nvim right now
+  --[=====[
   { -- Autoformat
     'stevearc/conform.nvim',
     lazy = false,
@@ -43,4 +45,5 @@ return {
       },
     },
   },
+  --]=====]
 }
