@@ -69,8 +69,10 @@ outer.right = 10
 # Assign workspaces to monitor
 # See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [workspace-to-monitor-force-assignment]
-9 = 'built-in'
-10 = 'built-in'
+7 = ['3', 'built-in']
+8 = ['3', 'built-in']
+9 = ['built-in']
+10 = ['built-in']
 
 # For 'built-in' App IDs, see: https://nikitabobko.github.io/AeroSpace/goodness#popular-apps-ids
 
