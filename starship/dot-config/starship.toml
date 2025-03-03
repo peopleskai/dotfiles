@@ -18,6 +18,9 @@ $time\
 [ ](fg:#1d2230)\
 \n$character"""
 
+# Wait 500ms max to timeout slow Git commands
+command_timeout = 500
+
 [os]
 style = "fg:#090c0c bg:#a3aed2"
 disabled = false

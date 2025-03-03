@@ -49,7 +49,7 @@ vim.opt.scrolloff = 10
 -- Set highlight on search
 vim.opt.hlsearch = true
 
-vim.opt.colorcolumn = '100'
+vim.opt.colorcolumn = '150'
 
 -- Set completeopt to have a better completion experience
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
