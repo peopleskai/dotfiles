@@ -7,6 +7,7 @@ return {
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'mfussenegger/nvim-jdtls',
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -168,8 +169,13 @@ return {
         capabilities = capabilities,
       })
 
+      -- Swift SourceKit Config
+      require('lspconfig').sourcekit.setup({})
+
       -- Python LSP setup
       require('lspconfig').pyright.setup({})
+
+      require('lspconfig').jdtls.setup({})
 
       -- Custom Rust config to work with Amazon cargo build system
       -- require('lspconfig').rust_analyzer.setup({
@@ -299,6 +305,10 @@ return {
           { name = 'treesitter' },
         },
       })
+
+      -- If you want insert `(` after select function or method item
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
     end,
   },
 
@@ -356,20 +366,6 @@ return {
         },
       }
       require('lspconfig').barium.setup({})
-    end,
-  },
-  -- Java LSP for Brazil Java projects
-  {
-    'mfussenegger/nvim-jdtls',
-    dependencies = {
-      'neovim/nvim-lspconfig',
-    },
-    cond = function()
-      return os.getenv('WORK_ENV') ~= nil
-    end,
-    config = function()
-      -- Java LSP setup
-      require('lspconfig').jdtls.setup({})
     end,
   },
 }
