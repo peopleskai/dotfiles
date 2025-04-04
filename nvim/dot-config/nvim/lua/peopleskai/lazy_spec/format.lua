@@ -1,139 +1,71 @@
 return {
-  -- Default config: https://github.com/stevearc/conform.nvim?tab=readme-ov-file#options
-  {
-    'stevearc/conform.nvim',
-    lazy = false,
-    keys = {
-      {
-        '<leader>fb',
-        function()
-          require('conform').format({ async = true, lsp_fallback = true })
-        end,
-        mode = '',
-        desc = '[F]ormat [B]uffer',
-      },
-      {
-        '<leader>ft',
-        function()
-          -- If autoformat is currently disabled for this buffer,
-          -- then enable it, otherwise disable it
-          if vim.b.disable_autoformat then
-            vim.cmd('FormatEnable')
-            vim.notify('Enabled autoformat for current buffer')
-          else
-            vim.cmd('FormatDisable!')
-            vim.notify('Disabled autoformat for current buffer')
-          end
-        end,
-        mode = '',
-        desc = '[F]ormat [T]oggle buffer',
-      },
-      {
-        '<leader>fT',
-        function()
-          -- If autoformat is currently disabled for this buffer,
-          -- then enable it, otherwise disable it
-          if vim.g.disable_autoformat then
-            vim.cmd('FormatEnable')
-            vim.notify('Enabled autoformat for globally.')
-          else
-            vim.cmd('FormatDisable')
-            vim.notify('Disabled autoformat for globally.')
-          end
-        end,
-        mode = '',
-        desc = '[F]ormat [T]oggle globally',
-      },
-    },
-    opts = {
-      format_on_save = function(bufnr)
-        -- Check if format on save is disabled
-        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-          return
-        end
-
-        -- Disable lsp fallback for languages that don't have a well standardized coding style
-        local disable_lsp_fallback = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_lsp_fallback[vim.bo[bufnr].filetype],
-        }
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        python = { 'isort', 'black' },
-        rust = { 'rustfmt', lsp_format = 'fallback' },
-        sh = { 'shfmt' },
-        c = { 'clang-format -i' },
-        cpp = { 'clang-format -i' },
-        cmake = { 'gersemi' },
-        toml = { 'taplo' },
-        markdown = { 'prettier' },
-        dart = { 'dart format' },
-        javascript = { { 'prettierd', 'prettier', stop_after_first = true } },
-        typescript = { { 'prettierd', 'prettier', stop_after_first = true } },
-        shfmt = {
-          prepend_args = { '-i', '4', '-ci' },
-        },
-      },
-    },
-    config = function(_, opts)
-      require('conform').setup(opts)
-
-      vim.api.nvim_create_user_command('FormatDisable', function(args)
-        if args.bang then
-          -- :FormatDisable! disables autoformat for this buffer only
-          vim.b.disable_autoformat = true
-        else
-          -- :FormatDisable disables autoformat globally
-          vim.g.disable_autoformat = true
-        end
-      end, {
-        desc = 'Disable autoformat-on-save',
-        bang = true, -- allows the ! variant
-      })
-
-      vim.api.nvim_create_user_command('FormatEnable', function()
-        vim.b.disable_autoformat = false
-        vim.g.disable_autoformat = false
-      end, {
-        desc = 'Re-enable autoformat-on-save',
-      })
-    end,
+  'stevearc/conform.nvim',
+  dependencies = {
+    'lewis6991/gitsigns.nvim',
   },
-  -- Deprecated, going back to conform.nvim right now
-  --   {
-  --     'nvimdev/guard.nvim',
-  --     -- Builtin configuration, optional
-  --     dependencies = {
-  --       'nvimdev/guard-collection',
-  --     },
-  --     config = function()
-  --       local ft = require('guard.filetype')
-  --
-  --       ft('c'):fmt('clang-format'):lint('clang-tidy')
-  --
-  --       ft('cpp'):fmt('clang-format'):lint('clang-tidy')
-  --
-  --       ft('lua'):fmt('lsp'):append('stylua'):lint('selene')
-  --
-  --       ft('typescript,javascript,typescriptreact'):fmt('prettier')
-  --
-  --       ft('cmake'):fmt({
-  --         cmd = 'gersemi',
-  --         stdin = true,
-  --       })
-  --
-  --       ft('sh'):fmt('shfmt')
-  --
-  --       ft('rust'):fmt('lsp')
-  --
-  --       ft('python'):fmt('isort'):append('black')
-  --
-  --       ft('swift'):fmt('swiftformat'):lint({
-  --         cmd = 'swiftlint',
-  --         stdin = true,
-  --       })
-  --     end,
-  --   },
+  opts = {
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      -- Conform will run multiple formatters sequentially
+      python = { 'isort', 'black' },
+      -- You can customize some of the format options for the filetype (:help conform.format)
+      rust = { 'rustfmt', lsp_format = 'fallback' },
+      sh = { 'shfmt' },
+      c = { 'clang-format' },
+      cpp = { 'clang-format' },
+      cmake = { 'gersemi' },
+      toml = { 'taplo' },
+      markdown = { 'prettier' },
+      dart = { 'dart format' },
+      -- Conform will run the first available formatter
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { { 'prettierd', 'prettier', stop_after_first = true } },
+      shfmt = {
+        prepend_args = { '-i', '4', '-ci' },
+      },
+    },
+  },
+  -- config doesn't work here, have to use init
+  init = function()
+    local function format_hunk(bufnr)
+      local format = require('conform').format
+
+      -- stylua range format mass up indent, so use full format for now
+      local range_ignore_filetypes = { 'lua' }
+      if vim.tbl_contains(range_ignore_filetypes, vim.bo.filetype) then
+        format({ lsp_fallback = true, timeout_ms = 500 })
+        return
+      end
+
+      local hunks = require('gitsigns').get_hunks(bufnr)
+      if not hunks then
+        vim.notify('No hunks to format in this buffer')
+        return
+      end
+
+      for i = #hunks, 1, -1 do
+        local hunk = hunks[i]
+        if hunk ~= nil and hunk.type ~= 'delete' then
+          local start = hunk.added.start
+          local last = start + hunk.added.count
+          -- nvim_buf_get_lines uses zero-based indexing -> subtract from last
+          local last_hunk_line = vim.api.nvim_buf_get_lines(0, last - 2, last - 1, true)[1]
+          local range = { start = { start, 0 }, ['end'] = { last - 1, last_hunk_line:len() } }
+          format({ range = range })
+        end
+      end
+    end
+
+    vim.api.nvim_create_autocmd('BufWritePre', {
+      pattern = '*',
+      callback = function(args)
+        format_hunk(args.buf)
+        -- require('conform').format({ bufnr = args.buf })
+      end,
+    })
+
+    vim.keymap.set('', '<leader>Ff', function()
+      require('conform').format({ async = true })
+    end, { desc = '[F]ormat [F]ile' })
+  end,
 }
