@@ -63,6 +63,7 @@ vim.opt.termguicolors = true
 -- Enable local project settings
 vim.opt.exrc = true
 
+-- Enable copy over SSH
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
@@ -74,3 +75,30 @@ vim.g.clipboard = {
     ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
   },
 }
+
+-- Wezterm MUX has a bug in synchronized output, turn off neovim's termsync to avoid line artifacts
+-- See https://github.com/wezterm/wezterm/issues/4607
+-- vim.opt.termsync = false
+
+vim.api.nvim_create_autocmd({ 'CursorHold' }, {
+  pattern = '*',
+  callback = function()
+    for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.api.nvim_win_get_config(winid).zindex then
+        return
+      end
+    end
+
+    vim.diagnostic.open_float({
+      scope = 'cursor',
+      focusable = false,
+      close_events = {
+        'CursorMoved',
+        'CursorMovedI',
+        'BufHidden',
+        'InsertCharPre',
+        'WinLeave',
+      },
+    })
+  end,
+})

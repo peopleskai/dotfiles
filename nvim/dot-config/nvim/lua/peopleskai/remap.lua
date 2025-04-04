@@ -35,3 +35,21 @@ vim.keymap.set('n', '<leader>sr', ':%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left
 
 -- <Esc> to unhighlight search in normal mode
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+vim.keymap.set('n', '<leader>dt', function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = '[D]iagnostic [T]oggle' })
+
+vim.keymap.set('n', '<leader>dm', function()
+  vim.diagnostic.open_float({
+    scope = 'cursor',
+    focusable = false,
+    close_events = {
+      'CursorMoved',
+      'CursorMovedI',
+      'BufHidden',
+      'InsertCharPre',
+      'WinLeave',
+    },
+  })
+end, { desc = '[D]iagnostic [M]essage' })
