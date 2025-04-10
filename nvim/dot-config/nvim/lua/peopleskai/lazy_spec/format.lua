@@ -23,6 +23,7 @@ return {
       shfmt = {
         prepend_args = { '-i', '4', '-ci' },
       },
+      java = { 'checkstyle' },
     },
   },
   -- config doesn't work here, have to use init

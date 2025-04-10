@@ -19,7 +19,7 @@ config = {
   font = wezterm.font("FiraCode Nerd Font"),
   -- full screen behavior --
   native_macos_fullscreen_mode = true,
-  leader = { key = "a", mods = "CTRL" },
+  leader = { key = "a", mods = "CMD" },
   keys = {
     -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
     { key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
