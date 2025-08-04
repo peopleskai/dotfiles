@@ -96,7 +96,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # Preview file content using bat (https://github.com/sharkdp/bat)
 export FZF_CTRL_T_OPTS="
-  --walker-skip .git,node_modules,target
+  --walker-skip .git,node_modules,target,build,.bemol,.brazil,.brazil,.builder-mcp
   --preview 'bat -n --color=always {}'
   --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
@@ -110,7 +110,7 @@ export FZF_CTRL_R_OPTS="
 
 # Print tree structure using eza (https://eza.rocks)
 export FZF_ALT_C_OPTS="
-  --walker-skip .git,node_modules,target
+  --walker-skip .git,node_modules,target,build,.bemol,.brazil
   --preview 'eza --tree {}'"
 
 # Fuzy find git branches
@@ -148,10 +148,6 @@ fzf-git-checkout() {
 }
 alias gco='fzf-git-checkout'
 
-#
-# Fzf Tab Configuration
-#
-
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
 # set descriptions format to enable group support
@@ -187,3 +183,11 @@ eval "$(starship init zsh)"
 # Local settings
 #
 [ -f ~/.local_zshrc ] && source ~/.local_zshrc
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
+
+export AWS_EC2_METADATA_DISABLED=true
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
