@@ -7,9 +7,10 @@ return {
       'sindrets/diffview.nvim', -- optional - Diff integration
       'nvim-telescope/telescope.nvim',
     },
-    config = function()
-      local neogit = require('neogit')
-      vim.keymap.set('n', '<leader>gs', neogit.open, { desc = '[G]it [S]tatus' })
+    init = function()
+      vim.keymap.set('n', '<leader>gs', function()
+        require('neogit').open({ cwd = vim.fn.expand('%:p:h') })
+      end, { desc = '[G]it [S]tatus' })
     end,
   },
 
