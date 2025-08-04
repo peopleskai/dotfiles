@@ -1,3 +1,6 @@
 [tools]
+gradle = "7.1.1"
+kotlin = "2.1.10"
 node = '22'
-python = '3.12'
+python = "3"
+yarn = "latest"
