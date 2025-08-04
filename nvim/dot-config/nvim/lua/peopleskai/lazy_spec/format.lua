@@ -19,20 +19,25 @@ return {
       dart = { 'dart format' },
       -- Conform will run the first available formatter
       javascript = { 'prettierd', 'prettier', stop_after_first = true },
-      typescript = { { 'prettierd', 'prettier', stop_after_first = true } },
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
       shfmt = {
         prepend_args = { '-i', '4', '-ci' },
       },
-      java = { 'checkstyle' },
+      java = { 'intellij', lsp_format = 'fallback' },
     },
   },
   -- config doesn't work here, have to use init
   init = function()
+    --
+    -- Only auto format changed lines.
+    -- Changed lines are detected through gitsigns plugin
+    --
     local function format_hunk(bufnr)
       local format = require('conform').format
 
       -- stylua range format mass up indent, so use full format for now
-      local range_ignore_filetypes = { 'lua' }
+      -- Intellij format takes too long
+      local range_ignore_filetypes = { 'lua', 'java' }
       if vim.tbl_contains(range_ignore_filetypes, vim.bo.filetype) then
         format({ lsp_fallback = true, timeout_ms = 500 })
         return
@@ -56,13 +61,36 @@ return {
         end
       end
     end
-
     vim.api.nvim_create_autocmd('BufWritePre', {
       pattern = '*',
       callback = function(args)
+        -- Disable with a global or buffer-local variable
+        if vim.g.disable_autoformat or vim.b[args.buf].disable_autoformat then
+          return
+        end
+
         format_hunk(args.buf)
         -- require('conform').format({ bufnr = args.buf })
       end,
+    })
+
+    vim.api.nvim_create_user_command('FormatDisable', function(args)
+      if args.bang then
+        -- FormatDisable! will disable formatting just for this buffer
+        vim.b.disable_autoformat = true
+      else
+        vim.g.disable_autoformat = true
+      end
+    end, {
+      desc = 'Disable autoformat-on-save',
+      bang = true,
+    })
+
+    vim.api.nvim_create_user_command('FormatEnable', function()
+      vim.b.disable_autoformat = false
+      vim.g.disable_autoformat = false
+    end, {
+      desc = 'Re-enable autoformat-on-save',
     })
 
     vim.keymap.set('', '<leader>Ff', function()
