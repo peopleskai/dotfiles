@@ -6,60 +6,105 @@ local config = wezterm.config_builder()
 
 -- This is where you actually apply your config choices
 config = {
-  -- color --
-  color_scheme = "Tokyo Night",
-  -- scroll bar --
-  enable_scroll_bar = true,
-  -- How many lines of scrollback you want to retain per tab
-  scrollback_lines = 3500,
-  -- Opacity
-  window_background_opacity = 0.97,
-  text_background_opacity = 1.0,
-  -- font
-  font = wezterm.font("FiraCode Nerd Font"),
-  -- full screen behavior --
-  native_macos_fullscreen_mode = true,
-  leader = { key = "a", mods = "CMD" },
-  keys = {
-    -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
-    { key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
-    -- Make Option-Right equivalent to Alt-f; forward-word
-    { key = "RightArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bf" }) },
-    -- Testing from here --
-    -- spawn pane
-    {
-      key = "s",
-      mods = "CMD",
-      action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-    },
-    {
-      key = "s",
-      mods = "CMD|SHIFT",
-      action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
-    },
-    -- kill pane
-    {
-      key = "s",
-      mods = "LEADER",
-      action = wezterm.action.CloseCurrentPane({ confirm = true }),
-    },
-    -- pane selection
-    {
-      key = "m",
-      mods = "CMD",
-      action = wezterm.action.PaneSelect,
-    },
-  },
+	-- color --
+	color_scheme = "Tokyo Night",
+	-- scroll bar --
+	enable_scroll_bar = true,
+	-- How many lines of scrollback you want to retain per tab
+	scrollback_lines = 3500,
+	-- Opacity
+	-- window_background_opacity = 0.92,
+	macos_window_background_blur = 8,
+	text_background_opacity = 1.0,
+	-- font
+	font = wezterm.font("FiraCode Nerd Font"),
+	font_size = 12.5,
+	-- full screen behavior --
+	native_macos_fullscreen_mode = true,
+	leader = { key = "a", mods = "CMD" },
+	keys = {
+		-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
+		{ key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
+		-- Make Option-Right equivalent to Alt-f; forward-word
+		{ key = "RightArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bf" }) },
+		-- Testing from here --
+		-- spawn pane
+		{
+			key = "s",
+			mods = "CMD",
+			action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
+		},
+		{
+			key = "s",
+			mods = "CMD|SHIFT",
+			action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
+		},
+		-- kill pane
+		{
+			key = "s",
+			mods = "LEADER",
+			action = wezterm.action.CloseCurrentPane({ confirm = true }),
+		},
+		-- pane selection
+		{
+			key = "m",
+			mods = "CMD",
+			action = wezterm.action.PaneSelect,
+		},
+	},
+
+	-- SSH domains should not be committed
+	ssh_domains = {
+		{
+			name = "rasberrypi",
+			remote_address = "yuenton-pi.local",
+			username = "yuenton",
+			multiplexing = "WezTerm",
+		},
+		{
+			name = "clouddesk",
+			remote_address = "dev-dsk-yuenton-2a-3cc4ac55.us-west-2.amazon.com",
+			ssh_option = {
+				identityfile = "/Users/yuenton/.ssh/id_ecdsa",
+			},
+			username = "yuenton",
+			multiplexing = "WezTerm",
+		},
+		{
+			name = "cloudesk_dshs",
+			remote_address = "dev-dsk-yuenton-2a-29d128b9.us-west-2.amazon.com",
+			ssh_option = {
+				identityfile = "/Users/yuenton/.ssh/id_ecdsa",
+			},
+			username = "yuenton",
+			multiplexing = "WezTerm",
+		},
+		{
+			name = "clouddesk-fos-puffin",
+			remote_address = "dev-dsk-yuenton-2a-3fe0bd27.us-west-2.amazon.com",
+			username = "yuenton",
+			local_echo_threshold_ms = 100000,
+		},
+		{
+			name = "clouddesk_connectedhomeip",
+			remote_address = "dev-dsk-yuenton-2a-a466f2ae.us-west-2.amazon.com",
+			ssh_option = {
+				identityfile = "/Users/yuenton/.ssh/id_ecdsa",
+			},
+			username = "yuenton",
+			multiplexing = "WezTerm",
+		},
+	},
 }
 
 -- Show domain on tab
 wezterm.on("format-tab-title", function(tab)
-  local pane = tab.active_pane
-  local title = pane.title
-  if pane.domain_name then
-    title = title .. " - (" .. pane.domain_name .. ")"
-  end
-  return title
+	local pane = tab.active_pane
+	local title = pane.title
+	if pane.domain_name then
+		title = title .. " - (" .. pane.domain_name .. ")"
+	end
+	return title
 end)
 
 -- and finally, return the configuration to wezterm

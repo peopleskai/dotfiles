@@ -87,7 +87,6 @@ alias tree='eza --tree $eza_params'
 #
 
 # Replace cat with bat
-alias cat=$(which bat)
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 #
@@ -95,10 +94,12 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 #
 
 # Preview file content using bat (https://github.com/sharkdp/bat)
+# export FZF_CTRL_T_OPTS="--preview-window=hidden --with-nth -2,1 --keep-right"
+# --preview 'bat -n --color=always {}'
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
-  --preview 'bat -n --color=always {}'
-  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+  --preview-window=hidden
+  --with-nth -2,1 --keep-right"
 
 # CTRL-/ to toggle small preview window to see the full command
 # CTRL-Y to copy the command into clipboard using pbcopy
@@ -148,10 +149,6 @@ fzf-git-checkout() {
 }
 alias gco='fzf-git-checkout'
 
-#
-# Fzf Tab Configuration
-#
-
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
 # set descriptions format to enable group support
@@ -187,3 +184,8 @@ eval "$(starship init zsh)"
 # Local settings
 #
 [ -f ~/.local_zshrc ] && source ~/.local_zshrc
+
+# if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
+
+export AWS_EC2_METADATA_DISABLED=true
+

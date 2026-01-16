@@ -120,7 +120,7 @@ run = 'layout floating'
 
 # Amazon VPN floating window
 [[on-window-detected]]
-if.app-id = 'com.cisco.anyconnect.gui'
+if.app-id = 'com.cisco.secureclient*'
 check-further-callbacks = true
 run = 'layout floating'
 
@@ -129,6 +129,36 @@ run = 'layout floating'
 if.app-id = 'com.amazon.ACME'
 check-further-callbacks = true
 run = 'layout floating'
+
+# Amazon Connections floating window
+[[on-window-detected]]
+if.app-id = 'com.electron.amazonconnections'
+check-further-callbacks = true
+run = 'layout floating'
+
+# Chrome for leisure should be in window 9
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+check-further-callbacks = true
+run = 'move-node-to-workspace 9'
+
+# Outlook should be in window 8
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+check-further-callbacks = true
+run = 'move-node-to-workspace 9'
+
+# Amazon Chime should always be in window 0
+[[on-window-detected]]
+if.app-id = 'com.amazon.Amazon-Chime'
+check-further-callbacks = true
+run = 'move-node-to-workspace 10'
+
+# Slack should be in window 0
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+check-further-callbacks = true
+run = 'move-node-to-workspace 10'
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
