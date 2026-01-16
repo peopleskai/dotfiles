@@ -40,6 +40,10 @@ vim.keymap.set('n', '<leader>dt', function()
   vim.diagnostic.enable(not vim.diagnostic.is_enabled())
 end, { desc = '[D]iagnostic [T]oggle' })
 
+vim.keymap.set('n', '<leader>cpa', ':let @+ = expand("%:a")<CR>', { desc = '[C]opy [P]ath [A]bsolute' })
+vim.keymap.set('n', '<leader>cpr', ':let @+ = expand("%:p:.")<CR>', { desc = '[C]opy [P]ath [R]elative' })
+vim.keymap.set('n', '<leader>cpf', ':let @+ = expand("%:t")<CR>', { desc = '[C]opy [P]ath [F]ilename' })
+
 vim.keymap.set('n', '<leader>dm', function()
   vim.diagnostic.open_float({
     scope = 'cursor',
