@@ -4,6 +4,7 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
+      'mfussenegger/nvim-jdtls',
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
@@ -112,7 +113,6 @@ return {
         'isort',
         'black',
         'typescript-language-server',
-        'kotlin-language-server',
       }
 
       require('mason').setup()
@@ -177,7 +177,36 @@ return {
       require('lspconfig').pyright.setup({})
 
       -- Kotlin LSP setup
-      require('lspconfig').kotlin_language_server.setup({})
+      require('lspconfig').kotlin_language_server.setup({
+        on_attach = function()
+          bemol()
+        end,
+        cmd = { os.getenv('HOME') .. '/lsp/kotlin-language-server-1-3-3/bin/kotlin-language-server' },
+      })
+
+      -- Custom Rust config to work with Amazon cargo build system
+      -- require('lspconfig').rust_analyzer.setup({
+      --   capabilities = capabilities,
+      -- settings = {
+      -- ['rust-analyzer'] = {
+      -- cargo = {
+      --   extraEnv = {
+      --     CARGO_PROFILE_RUST_ANALYZER_INHERITS = 'dev',
+      --   },
+      --   extraArgs = { '--profile', 'rust-analyzer' },
+      -- extraArgs = { '--target-dir', 'rust-analyzer-check' },
+      -- targetDir = true,
+      -- },
+      -- check = {
+      --   extraArgs = { '--target-dir', 'target/check' },
+      -- },
+      -- files = {
+      -- Ignore build folder used for brazil-build
+      -- excludeDirs = { 'build' },
+      -- },
+      -- },
+      -- },
+      -- })
     end,
   },
   -- Autocompletion
