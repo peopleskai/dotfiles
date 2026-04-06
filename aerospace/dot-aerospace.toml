@@ -15,7 +15,7 @@ after-login-command = []
 after-startup-command = [
   # JankyBorders has a built-in detection of already running process,
   # so it won't be run twice on AeroSpace restart
-  'exec-and-forget borders active_color=0xffe2e2e3 inactive_color=0xff414550 width=6.0 style=round hidpi=off',
+  # 'exec-and-forget borders active_color=0xffe2e2e3 inactive_color=0xff414550 width=6.0 style=round hidpi=off',
 ]
 
 # Start AeroSpace at login
@@ -164,6 +164,12 @@ run = 'move-node-to-workspace 10'
 if.app-id = 'com.tinyspeck.slackmacgap'
 check-further-callbacks = true
 run = 'move-node-to-workspace 10'
+
+# Ghostty issue workaround
+# New tabs need to be floating, since its treated as a seperate window
+[[on-window-detected]]
+if.app-id = "com.mitchellh.ghostty"
+run = ["layout floating"]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
