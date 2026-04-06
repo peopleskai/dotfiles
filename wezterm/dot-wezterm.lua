@@ -1,66 +1,194 @@
--- Pull in the wezterm API
 local wezterm = require("wezterm")
-
--- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- This is where you actually apply your config choices
+-----------------------------------------
+-- Base config
+-----------------------------------------
 config = {
-  -- color --
   color_scheme = "Tokyo Night",
-  -- scroll bar --
+  quick_select_remove_styling = true,
+  -- scroll
   enable_scroll_bar = true,
-  -- How many lines of scrollback you want to retain per tab
-  scrollback_lines = 3500,
+  scrollback_lines = 50000,
   -- Opacity
-  window_background_opacity = 0.97,
+  window_background_opacity = 0.92,
+  macos_window_background_blur = 8,
   text_background_opacity = 1.0,
   -- font
-  font = wezterm.font("FiraCode Nerd Font"),
-  -- full screen behavior --
-  native_macos_fullscreen_mode = true,
-  leader = { key = "a", mods = "CMD" },
+  font = wezterm.font("JetBrains Mono"),
+  font_size = 12.5,
+  --aerospace compatibility
+  window_decorations = "RESIZE",
+
+  leader = { key = "a", mods = "CTRL" },
   keys = {
-    -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
+    -- Make Option-<arrow equivalent to Alt-b which many line editors interpret as backward-word
     { key = "LeftArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bb" }) },
-    -- Make Option-Right equivalent to Alt-f; forward-word
     { key = "RightArrow", mods = "OPT", action = wezterm.action({ SendString = "\x1bf" }) },
-    -- Testing from here --
-    -- spawn pane
-    {
-      key = "s",
-      mods = "CMD",
-      action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-    },
-    {
-      key = "s",
-      mods = "CMD|SHIFT",
-      action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
-    },
-    -- kill pane
+    -- pane management
     {
       key = "s",
       mods = "LEADER",
-      action = wezterm.action.CloseCurrentPane({ confirm = true }),
+      action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
     },
-    -- pane selection
     {
-      key = "m",
-      mods = "CMD",
-      action = wezterm.action.PaneSelect,
+      key = "v",
+      mods = "LEADER",
+      action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
     },
+    {
+      key = "c",
+      mods = "LEADER",
+      action = wezterm.action.CloseCurrentPane({ confirm = false }),
+    },
+    -- Prompt for a name to use for a new workspace and switch to it.
+    {
+      key = 'W',
+      mods = 'LEADER',
+      action = wezterm.action.PromptInputLine {
+        description = wezterm.format {
+          { Attribute = { Intensity = 'Bold' } },
+          { Foreground = { AnsiColor = 'Fuchsia' } },
+          { Text = 'Enter name for new workspace' },
+        },
+        action = wezterm.action_callback(function(window, pane, line)
+          -- line will be `nil` if they hit escape without entering anything
+          -- An empty string if they just hit enter
+          -- Or the actual line of text they wrote
+          if line then
+            window:perform_action(
+              wezterm.action.SwitchToWorkspace {
+                name = line,
+              },
+              pane
+            )
+          end
+        end),
+      },
+    },
+  },
+
+  -- SSH domains loaded from ~/.wezterm_ssh_domain.lua (local-only, not committed)
+  ssh_domains = (function()
+    local f = io.open(wezterm.home_dir .. "/.wezterm_ssh_domain.lua", "r")
+    if f then
+      f:close()
+      return dofile(wezterm.home_dir .. "/.wezterm_ssh_domain.lua")
+    end
+    return {}
+  end)(),
+}
+
+-----------------------------------------
+-- Terminal URI Receip
+-----------------------------------------
+local function is_shell(foreground_process_name)
+  local shell_names = { 'bash', 'zsh', 'fish', 'sh', 'ksh', 'dash' }
+  local process = string.match(foreground_process_name, '[^/\\]+$')
+    or foreground_process_name
+  for _, shell in ipairs(shell_names) do
+    if process == shell then
+      return true
+    end
+  end
+  return false
+end
+
+wezterm.on('open-uri', function(window, pane, uri)
+  local editor = 'nvim'
+
+  if uri:find '^file:' == 1 and not pane:is_alt_screen_active() then
+    -- We're processing an hyperlink and the uri format should be: file://[HOSTNAME]/PATH[#linenr]
+    -- Also the pane is not in an alternate screen (an editor, less, etc)
+    local url = wezterm.url.parse(uri)
+    if is_shell(pane:get_foreground_process_name()) then
+      -- A shell has been detected. Wezterm can check the file type directly
+      -- figure out what kind of file we're dealing with
+      local success, stdout, _ = wezterm.run_child_process {
+        'file',
+        '--brief',
+        '--mime-type',
+        url.file_path,
+      }
+      if success then
+        if stdout:find 'directory' then
+          pane:send_text(
+            wezterm.shell_join_args { 'cd', url.file_path } .. '\r'
+          )
+          pane:send_text(wezterm.shell_join_args {
+            'ls',
+            '-a',
+            '-p',
+            '--group-directories-first',
+          } .. '\r')
+          return false
+        end
+
+        if stdout:find 'text' then
+          if url.fragment then
+            pane:send_text(wezterm.shell_join_args {
+              editor,
+              '+' .. url.fragment,
+              url.file_path,
+            } .. '\r')
+          else
+            pane:send_text(
+              wezterm.shell_join_args { editor, url.file_path } .. '\r'
+            )
+          end
+          return false
+        end
+      end
+    else
+      -- No shell detected, we're probably connected with SSH, use fallback command
+      local edit_cmd = url.fragment
+          and editor .. ' +' .. url.fragment .. ' "$_f"'
+        or editor .. ' "$_f"'
+      local cmd = '_f="'
+        .. url.file_path
+        .. '"; { test -d "$_f" && { cd "$_f" ; ls -a -p --hyperlink --group-directories-first; }; } '
+        .. '|| { test "$(file --brief --mime-type "$_f" | cut -d/ -f1 || true)" = "text" && '
+        .. edit_cmd
+        .. '; }; echo'
+      pane:send_text(cmd .. '\r')
+      return false
+    end
+  end
+
+  -- without a return value, we allow default actions
+end)
+
+config.mouse_bindings = {
+  {
+    event = { Up = { streak = 1, button = 'Left' } },
+    mods = 'CTRL',
+    action = wezterm.action.OpenLinkAtMouseCursor,
+  },
+  -- Disable the 'Down' event of CTRL-Click to avoid weird program behaviors
+  {
+    event = { Down = { streak = 1, button = 'Left' } },
+    mods = 'CTRL',
+    action = wezterm.action.Nop,
   },
 }
 
--- Show domain on tab
-wezterm.on("format-tab-title", function(tab)
-  local pane = tab.active_pane
-  local title = pane.title
-  if pane.domain_name then
-    title = title .. " - (" .. pane.domain_name .. ")"
-  end
-  return title
+-----------------------------------------
+-- MUX lag debugging
+-----------------------------------------
+wezterm.on('update-right-status', function(window, pane)
+  window:set_right_status(window:active_workspace())
 end)
 
--- and finally, return the configuration to wezterm
+-----------------------------------------
+-- MUX lag debugging
+-----------------------------------------
+-- config.front_end = 'OpenGL' -- Use OpenGL instead of WebGpu
+config.max_fps = 120 -- Improve responsiveness
+
+-----------------------------------------
+-- UI not updating debugging
+-----------------------------------------
+config.front_end = "WebGpu" -- Or "OpenGL"
+config.webgpu_power_preference = "HighPerformance"
+
 return config
