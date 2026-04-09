@@ -87,7 +87,12 @@ local plugins = {
   gh('hrsh7th/nvim-cmp'),
 
   -- Rust
-  { src = gh('mrcjkb/rustaceanvim'), version = vim.version.range('4.0') },
+  {
+    src = gh('mrcjkb/rustaceanvim'),
+    -- To avoid being surprised by breaking changes,
+    -- I recommend you set a version range
+    version = vim.version.range('^9')
+  },
 
   -- Lua dev
   gh('folke/lazydev.nvim'),
@@ -356,7 +361,6 @@ require('mason-tool-installer').setup({
     'lua-language-server',
     'marksman',
     'pyright',
-    'rust-analyzer',
     'shfmt',
     'stylua',
     'taplo',

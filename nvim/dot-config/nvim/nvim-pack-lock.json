@@ -178,7 +178,7 @@
     "rustaceanvim": {
       "rev": "d0cec198269c35485b12d9dd908c25e45a79231d",
       "src": "https://github.com/mrcjkb/rustaceanvim",
-      "version": "4.0.0 - 4.1.0"
+      "version": "9.0.0 - 10.0.0"
     },
     "telescope-file-browser.nvim": {
       "rev": "3610dc7dc91f06aa98b11dca5cc30dfa98626b7e",
