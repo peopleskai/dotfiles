@@ -1,0 +1,11 @@
+[tools]
+fd = "latest"
+node = "18.20.2"
+python = ["3.12", "3.11", "3.10", "3.9", "3.8"]
+eza = "latest"
+starship = "latest"
+ripgrep = "latest"
+zoxide = "latest"
+fzf = "latest"
+tree-sitter = "latest"
+"npm:tree-sitter-cli" = "latest"
