@@ -180,14 +180,22 @@ vim.keymap.set('n', '<leader>?', function() require('which-key').show({ global =
 require('flash').setup({
   modes = {
     search = { enabled = false },
-    char = { enabled = false },
+    char = { multi_line = false },
   },
 })
 -- stylua: ignore start
-vim.keymap.set({ 'n', 'x', 'o' }, 'f', function() require('flash').jump() end, { desc = 'Flash jump' })
-vim.keymap.set({ 'n', 'x', 'o' }, 't', function() require('flash').treesitter() end, { desc = 'Flash Treesitter Select' })
-vim.keymap.set('o', 'r', function() require('flash').remote() end, { desc = 'Remote Flash' })
+vim.keymap.set({ 'n', 'x', 'o' }, '<c-f>', function() require('flash').jump() end, { desc = 'Flash Jump' })
 -- stylua: ignore end
+
+-- Treesitter incremental selection
+vim.keymap.set({ 'n', 'x', 'o' }, '<c-space>', function()
+  require('flash').treesitter({
+    actions = {
+      ['<c-space>'] = 'next',
+      ['<BS>'] = 'prev',
+    },
+  })
+end, { desc = 'Treesitter incremental selection' })
 
 --------------------------------------------------------------------------------
 -- gitsigns
@@ -195,7 +203,9 @@ vim.keymap.set('o', 'r', function() require('flash').remote() end, { desc = 'Rem
 require('gitsigns').setup({
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
-    local opts = function(desc) return { buffer = bufnr, desc = desc } end
+    local opts = function(desc)
+      return { buffer = bufnr, desc = desc }
+    end
 
     -- Navigation
     vim.keymap.set('n', ']c', function()
