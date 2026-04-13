@@ -165,6 +165,13 @@ if.app-id = 'com.tinyspeck.slackmacgap'
 check-further-callbacks = true
 run = 'move-node-to-workspace 10'
 
+# Zoom should be in window 0
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+check-further-callbacks = true
+run = 'move-node-to-workspace 10'
+
+
 # Ghostty issue workaround
 # New tabs need to be floating, since its treated as a seperate window
 [[on-window-detected]]
