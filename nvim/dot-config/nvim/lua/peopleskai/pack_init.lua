@@ -592,10 +592,25 @@ end
 require('nvim-treesitter').setup({
   auto_install = true,
   ensure_installed = {
-    'c', 'lua', 'luadoc', 'vim', 'vimdoc', 'rust', 'python',
-    'bash', 'cpp', 'java', 'toml', 'kotlin', 'typescript', 'javascript',
+    'c',
+    'lua',
+    'luadoc',
+    'vim',
+    'vimdoc',
+    'rust',
+    'python',
+    'bash',
+    'cpp',
+    'java',
+    'toml',
+    'kotlin',
+    'typescript',
+    'javascript',
   },
 })
+-- Use treesitter for folding
+vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.wo[0][0].foldmethod = 'expr'
 
 --------------------------------------------------------------------------------
 -- mini.statusline
