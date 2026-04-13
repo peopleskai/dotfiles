@@ -1,7 +1,9 @@
 -- vim.pack plugin manager configuration (Neovim 0.12+)
 -- Replaces lazy.nvim with built-in vim.pack
 
-local gh = function(x) return 'https://github.com/' .. x end
+local gh = function(x)
+  return 'https://github.com/' .. x
+end
 
 --------------------------------------------------------------------------------
 -- Build hooks (must be registered BEFORE vim.pack.add)
@@ -9,7 +11,9 @@ local gh = function(x) return 'https://github.com/' .. x end
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
     local name, kind, path = ev.data.spec.name, ev.data.kind, ev.data.path
-    if kind ~= 'install' and kind ~= 'update' then return end
+    if kind ~= 'install' and kind ~= 'update' then
+      return
+    end
     if name == 'markdown-preview.nvim' then
       vim.system({ 'yarn', 'install' }, { cwd = path .. '/app' })
     elseif name == 'telescope-fzf-native.nvim' then
@@ -19,7 +23,9 @@ vim.api.nvim_create_autocmd('PackChanged', {
         vim.system({ 'make', 'install_jsregexp' }, { cwd = path })
       end
     elseif name == 'nvim-treesitter' then
-      if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
+      if not ev.data.active then
+        vim.cmd.packadd('nvim-treesitter')
+      end
       vim.cmd('TSUpdate')
     end
   end,
@@ -91,7 +97,7 @@ local plugins = {
     src = gh('mrcjkb/rustaceanvim'),
     -- To avoid being surprised by breaking changes,
     -- I recommend you set a version range
-    version = vim.version.range('^9')
+    version = vim.version.range('^9'),
   },
 
   -- Lua dev
@@ -152,7 +158,9 @@ require('nvim-ts-autotag').setup({
 })
 
 -- undotree
+-- stylua: ignore start
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+-- stylua: ignore end
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undodir = os.getenv('HOME') .. '/.vim/undodir'
@@ -162,9 +170,9 @@ vim.opt.undofile = true
 vim.o.timeout = true
 vim.o.timeoutlen = 300
 require('which-key').setup()
-vim.keymap.set('n', '<leader>?', function()
-  require('which-key').show({ global = false })
-end, { desc = 'Buffer Local Keymaps (which-key)' })
+-- stylua: ignore start
+vim.keymap.set('n', '<leader>?', function() require('which-key').show({ global = false }) end, { desc = 'Buffer Local Keymaps (which-key)' })
+-- stylua: ignore end
 
 --------------------------------------------------------------------------------
 -- flash.nvim
@@ -234,14 +242,10 @@ do
   })
 
   local builtin = require('telescope.builtin')
+-- stylua: ignore start
   vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope [F]ind [F]iles' })
   vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope [F]ind with live [G]rep' })
-  vim.keymap.set(
-    'n',
-    '<leader>fG',
-    ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-    { desc = 'Telescope [F]ind with live [G]rep with arguments' }
-  )
+  vim.keymap.set( 'n', '<leader>fG', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = 'Telescope [F]ind with live [G]rep with arguments' })
   vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope [F]ind [B]uffers' })
   vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope [F]ind [H]elp tags' })
   vim.keymap.set('n', '<leader>*', builtin.grep_string, { desc = 'Telescope grep word under cursor' })
@@ -250,6 +254,7 @@ do
   vim.keymap.set('n', '<leader>ft', builtin.treesitter, { desc = 'Telescope [F]ind with [T]reesitter' })
   vim.keymap.set('n', '<leader>fm', builtin.marks, { desc = 'Telescope [F]ind [M]arks' })
   vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = 'Telescope [G]it [B]ranches' })
+  -- stylua: ignore end
 
   require('telescope').load_extension('fzf')
   require('telescope').load_extension('file_browser')
@@ -259,9 +264,9 @@ end
 --------------------------------------------------------------------------------
 -- neogit
 --------------------------------------------------------------------------------
-vim.keymap.set('n', '<leader>gs', function()
-  require('neogit').open({ cwd = vim.fn.expand('%:p:h') })
-end, { desc = '[G]it [S]tatus' })
+-- stylua: ignore start
+vim.keymap.set('n', '<leader>gs', function() require('neogit').open({ cwd = vim.fn.expand('%:p:h') }) end, { desc = '[G]it [S]tatus' })
+-- stylua: ignore end
 
 --------------------------------------------------------------------------------
 -- conform.nvim
@@ -294,7 +299,9 @@ local function format_hunks(bufnr)
     return
   end
   local hunks = require('gitsigns').get_hunks(bufnr)
-  if not hunks then return end
+  if not hunks then
+    return
+  end
   for i = #hunks, 1, -1 do
     local hunk = hunks[i]
     if hunk and hunk.type ~= 'delete' then
@@ -308,13 +315,19 @@ end
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function(args)
-    if vim.g.disable_autoformat or vim.b[args.buf].disable_autoformat then return end
+    if vim.g.disable_autoformat or vim.b[args.buf].disable_autoformat then
+      return
+    end
     format_hunks(args.buf)
   end,
 })
 
 vim.api.nvim_create_user_command('FormatDisable', function(args)
-  if args.bang then vim.b.disable_autoformat = true else vim.g.disable_autoformat = true end
+  if args.bang then
+    vim.b.disable_autoformat = true
+  else
+    vim.g.disable_autoformat = true
+  end
 end, { desc = 'Disable autoformat-on-save', bang = true })
 
 vim.api.nvim_create_user_command('FormatEnable', function()
@@ -322,9 +335,9 @@ vim.api.nvim_create_user_command('FormatEnable', function()
   vim.g.disable_autoformat = false
 end, { desc = 'Re-enable autoformat-on-save' })
 
-vim.keymap.set('', '<leader>Ff', function()
-  require('conform').format({ async = true })
-end, { desc = '[F]ormat [F]ile' })
+-- stylua: ignore start
+vim.keymap.set('', '<leader>Ff', function() require('conform').format({ async = true }) end, { desc = '[F]ormat [F]ile' })
+-- stylua: ignore end
 
 --------------------------------------------------------------------------------
 -- nvim-lint
@@ -458,13 +471,19 @@ local servers = {
   taplo = { cmd = { 'taplo', 'lsp', 'stdio' }, filetypes = { 'toml' }, root_markers = { '.taplo.toml', '.git' } },
   marksman = { cmd = { 'marksman', 'server' }, filetypes = { 'markdown', 'markdown.mdx' }, root_markers = { '.marksman.toml', '.git' } },
   dartls = { cmd = { 'dart', 'language-server', '--protocol=lsp' }, filetypes = { 'dart' }, root_markers = { 'pubspec.yaml', '.git' } },
-  ts_ls = { cmd = { 'typescript-language-server', '--stdio' }, filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' }, root_markers = { 'tsconfig.json', 'package.json', '.git' } },
+  ts_ls = {
+    cmd = { 'typescript-language-server', '--stdio' },
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    root_markers = { 'tsconfig.json', 'package.json', '.git' },
+  },
   pyright = { cmd = { 'pyright-langserver', '--stdio' }, filetypes = { 'python' }, root_markers = { 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' } },
   kotlin_language_server = {
     cmd = { os.getenv('HOME') .. '/lsp/kotlin-language-server-1-3-3/bin/kotlin-language-server' },
     filetypes = { 'kotlin' },
     root_markers = { 'settings.gradle', 'settings.gradle.kts', 'build.gradle', 'build.gradle.kts', '.git' },
-    on_attach = function() bemol() end,
+    on_attach = function()
+      bemol()
+    end,
   },
 }
 
@@ -576,4 +595,6 @@ require('mini.statusline').setup()
 --------------------------------------------------------------------------------
 -- Plugin update keymap
 --------------------------------------------------------------------------------
+-- stylua: ignore start
 vim.keymap.set('n', '<leader>pu', function() vim.pack.update() end, { desc = 'Update plugins' })
+-- stylua: ignore end
