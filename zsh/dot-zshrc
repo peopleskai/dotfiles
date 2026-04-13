@@ -47,7 +47,9 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 #
 # fd Setup
 #
-fd --gen-completions zsh > ~/.zfunc/_fd
+mkdir -p $HOME/.zfunc
+fd --gen-completions zsh > $HOME/.zfunc/_fd
+fpath+=($HOME/.zfunc)
 
 #
 # FZF configurations
