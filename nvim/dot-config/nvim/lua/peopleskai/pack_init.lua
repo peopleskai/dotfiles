@@ -143,18 +143,24 @@ require('luasnip').config.setup({})
 -- markdown-preview
 vim.g.mkdp_filetypes = { 'markdown' }
 
--- nvim-ts-autotag
-require('nvim-ts-autotag').setup({
-  opts = {
-    enable_close = true,
-    enable_rename = true,
-    enable_close_on_slash = false,
-  },
-  per_filetype = {
-    ['html'] = {
-      enable_close = false,
-    },
-  },
+-- nvim-ts-autotag (only load for filetypes with HTML-like tags)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'html', 'xml', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue', 'tsx', 'jsx', 'markdown' },
+  once = true,
+  callback = function()
+    require('nvim-ts-autotag').setup({
+      opts = {
+        enable_close = true,
+        enable_rename = true,
+        enable_close_on_slash = false,
+      },
+      per_filetype = {
+        ['html'] = {
+          enable_close = false,
+        },
+      },
+    })
+  end,
 })
 
 -- undotree
