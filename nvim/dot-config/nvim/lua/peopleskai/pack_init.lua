@@ -186,11 +186,12 @@ vim.keymap.set('n', '<leader>?', function() require('which-key').show({ global =
 require('flash').setup({
   modes = {
     search = { enabled = false },
-    char = { multi_line = false },
+    char = { multi_line = false, highlight = { backdrop = false } },
   },
 })
 -- stylua: ignore start
-vim.keymap.set({ 'n', 'x', 'o' }, '<c-f>', function() require('flash').jump() end, { desc = 'Flash Jump' })
+vim.keymap.set({ 'n', 'x', 'o' }, '/', function() require('flash').jump() end, { desc = 'Flash Jump' })
+vim.keymap.set('n', '<leader>/', '/', { desc = 'Native Neovim Search' })
 -- stylua: ignore end
 
 -- Treesitter incremental selection
