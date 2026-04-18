@@ -306,35 +306,12 @@ require('conform').setup({
   },
 })
 
--- Format only git-modified hunks on save (falls back to full-file for lua/java)
-local range_ignore_ft = { lua = true, java = true }
-
-local function format_hunks(bufnr)
-  if range_ignore_ft[vim.bo.filetype] then
-    require('conform').format({ lsp_fallback = true, timeout_ms = 500 })
-    return
-  end
-  local hunks = require('gitsigns').get_hunks(bufnr)
-  if not hunks then
-    return
-  end
-  for i = #hunks, 1, -1 do
-    local hunk = hunks[i]
-    if hunk and hunk.type ~= 'delete' then
-      local start = hunk.added.start
-      local last = start + hunk.added.count
-      local last_line = vim.api.nvim_buf_get_lines(0, last - 2, last - 1, true)[1]
-      require('conform').format({ range = { start = { start, 0 }, ['end'] = { last - 1, last_line:len() } } })
-    end
-  end
-end
-
 vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function(args)
     if vim.g.disable_autoformat or vim.b[args.buf].disable_autoformat then
       return
     end
-    format_hunks(args.buf)
+    require('conform').format({ lsp_fallback = true, timeout_ms = 500 })
   end,
 })
 
