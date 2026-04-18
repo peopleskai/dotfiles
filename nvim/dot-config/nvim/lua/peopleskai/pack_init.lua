@@ -1,5 +1,4 @@
 -- vim.pack plugin manager configuration (Neovim 0.12+)
--- Replaces lazy.nvim with built-in vim.pack
 
 local gh = function(x)
   return 'https://github.com/' .. x
