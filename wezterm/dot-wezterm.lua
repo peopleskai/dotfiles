@@ -134,6 +134,16 @@ config = {
 }
 
 -----------------------------------------
+-- Plugin: CMD Picker
+-----------------------------------------
+local cmdpicker = wezterm.plugin.require("https://github.com/abidibo/wezterm-cmdpicker")
+-- Apply picker trigger (LEADER+Space by default) — call this LAST
+cmdpicker.apply_to_config(config, {
+	title = "Command Palette",
+	key = "f",
+})
+
+-----------------------------------------
 -- Terminal URI Receip
 -----------------------------------------
 local function is_shell(foreground_process_name)
