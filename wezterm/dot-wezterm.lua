@@ -2,6 +2,20 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 -----------------------------------------
+-- Plugin: resurrect
+-----------------------------------------
+local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
+-- Auto save every 15 minutes
+resurrect.state_manager.periodic_save({
+	interval_seconds = 5 * 60,
+	save_workspaces = true,
+	save_windows = true,
+	save_tabs = true,
+})
+-- Load saved workspace on startup
+wezterm.on("gui-startup", resurrect.state_manager.resurrect_on_gui_startup)
+
+-----------------------------------------
 -- Base config
 -----------------------------------------
 config = {
