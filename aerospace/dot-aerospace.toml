@@ -151,7 +151,7 @@ run = 'move-node-to-workspace 9'
 [[on-window-detected]]
 if.app-id = 'com.microsoft.Outlook'
 check-further-callbacks = true
-run = 'move-node-to-workspace 9'
+run = 'move-node-to-workspace 10'
 
 # Amazon Chime should always be in window 0
 [[on-window-detected]]
