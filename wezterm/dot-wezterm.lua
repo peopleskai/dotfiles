@@ -262,4 +262,25 @@ config.max_fps = 120 -- Improve responsiveness
 config.front_end = "WebGpu" -- Or "OpenGL"
 config.webgpu_power_preference = "HighPerformance"
 
+-----------------------------------------
+-- Tab name
+-----------------------------------------
+wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+	local pane = tab.active_pane
+	local title = pane.title
+	-- If in a multiplexed domain, you might want to prefix it
+	if pane.domain_name ~= "local" then
+		title = "🔗 " .. pane.domain_name
+	end
+	return title
+end)
+
+wezterm.on("update-status", function(window, pane)
+	local meta = pane:get_metadata() or {}
+	if meta.is_tardy then
+		local secs = meta.since_last_response_ms / 1000.0
+		window:set_right_status(string.format("tardy: %5.1fs⏳", secs))
+	end
+end)
+
 return config
