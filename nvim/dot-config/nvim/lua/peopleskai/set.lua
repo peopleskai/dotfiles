@@ -102,3 +102,11 @@ vim.api.nvim_create_autocmd({ 'CursorHold' }, {
     })
   end,
 })
+vim.api.nvim_create_augroup('AutoZv', { clear = true })
+vim.api.nvim_create_autocmd('CursorMoved', {
+  group = 'AutoZv',
+  pattern = '*',
+  callback = function()
+    vim.cmd('normal! zv')
+  end,
+})
