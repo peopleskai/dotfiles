@@ -180,6 +180,10 @@
       "src": "https://github.com/mrcjkb/rustaceanvim",
       "version": "9.0.0 - 10.0.0"
     },
+    "sidekick.nvim": {
+      "rev": "208e1c5b8170c01fd1d07df0139322a76479b235",
+      "src": "https://github.com/folke/sidekick.nvim"
+    },
     "telescope-file-browser.nvim": {
       "rev": "3610dc7dc91f06aa98b11dca5cc30dfa98626b7e",
       "src": "https://github.com/nvim-telescope/telescope-file-browser.nvim"

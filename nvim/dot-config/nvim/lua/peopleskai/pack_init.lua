@@ -109,6 +109,9 @@ local plugins = {
   gh('nvim-treesitter/nvim-treesitter-textobjects'),
   gh('nvim-treesitter/nvim-treesitter-context'),
   { src = gh('nvim-treesitter/nvim-treesitter'), version = 'main' },
+
+  -- AI tools
+  gh('folke/sidekick.nvim')
 }
 
 -- NinjaHooks: Amazon Brazil Config LSP (conditional)
@@ -640,6 +643,87 @@ require('nvim-treesitter').setup({
 -- Use treesitter for folding
 vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.wo[0][0].foldmethod = 'expr'
+
+--------------------------------------------------------------------------------
+-- AI Tool sidekick setup
+--------------------------------------------------------------------------------
+local is_fullscreen = false
+
+--- Toggle sidekick CLI between fullscreen float and default split, preserving vim mode.
+---@param t sidekick.cli.Terminal
+local function toggle_sidekick_fullscreen(t)
+  if not t:win_valid() then
+    vim.notify("Sidekick CLI window not found", vim.log.levels.WARN, { title = "Sidekick" })
+    return
+  end
+
+  local was_insert = vim.fn.mode():match('^[it]') ~= nil
+
+  if is_fullscreen then
+    vim.api.nvim_win_close(t.win, false)
+    t:show() -- reopen in default split layout (doesn't focus)
+    vim.api.nvim_set_current_win(t.win) -- focus back since t:show() opens with enter=false
+    is_fullscreen = false
+    if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    vim.notify("Split mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
+  else
+    vim.api.nvim_win_close(t.win, false)
+    t.win = vim.api.nvim_open_win(t.buf, true, { -- reopen as fullscreen float
+      relative = "editor",
+      row = 0,
+      col = 0,
+      width = vim.o.columns,
+      height = vim.o.lines - 3,
+      style = "minimal",
+      border = "none",
+    })
+    is_fullscreen = true
+    if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    vim.notify("Fullscreen mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
+  end
+end
+
+require('sidekick').setup({
+  nes = { enabled = false },
+  cli = {
+    win = {
+      keys = {
+        -- add fullscreen toggle
+        toggle_fullscreen = {
+          '<c-\\>',
+          function (t)
+            toggle_sidekick_fullscreen(t)
+          end,
+          mode = 'nt',
+        }
+      }
+    },
+    tools = {
+      kiro = {
+        cmd = { "kiro-cli", "chat", "--model", "claude-opus-4.6", "--trust-all-tools" },
+        name = "KiroCLI",
+      },
+      kiro_sisyphus = {
+        cmd = { "kiro-cli", "chat", "--agent", "sisyphus", "--trust-all-tools" },
+        name = "KiroCLI Sisyphus",
+        -- Optional: custom keymaps for this tool
+        -- keys = {
+        --   submit = { "<c-s>", function(t) t:send("\n") end },
+        -- },
+      },
+      kiro_sisyphus_2 = {
+        cmd = { "kiro-cli", "chat", "--agent", "sisyphus", "--trust-all-tools" },
+        name = "KiroCLI Sisyphus",
+      },
+    },
+  }
+})
+vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', function() require("sidekick.cli").focus() end, { desc = 'Sidekick Focus' })
+vim.keymap.set('n', '<leader>aa', function() require("sidekick.cli").toggle() end, { desc = 'Sidekick Toggle' })
+vim.keymap.set({ 'n', 'x' }, '<leader>at', function() require("sidekick.cli").send({ msg = "{this}" }) end, { desc = 'Sidekick Toggle' })
+vim.keymap.set('n', '<leader>af', function() require("sidekick.cli").send({ msg = "{file}" }) end, { desc = 'Sidekick Toggle' })
+vim.keymap.set('x', '<leader>av', function() require("sidekick.cli").send({ msg = "{selection}" }) end, { desc = 'Sidekick Toggle' })
+vim.keymap.set({ 'n', 'x' }, '<leader>ap', function() require("sidekick.cli").prompt() end, { desc = 'Sidekick Toggle' })
 
 --------------------------------------------------------------------------------
 -- mini.statusline
