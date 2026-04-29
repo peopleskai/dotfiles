@@ -192,8 +192,7 @@ require('flash').setup({
   },
 })
 -- stylua: ignore start
-vim.keymap.set({ 'n', 'x', 'o' }, '/', function() require('flash').jump() end, { desc = 'Flash Jump' })
-vim.keymap.set('n', '<leader>/', '/', { desc = 'Native Neovim Search' })
+vim.keymap.set('n', '<leader>/', function() require('flash').jump() end, { desc = 'Flash Jump' })
 -- stylua: ignore end
 
 -- Treesitter incremental selection
