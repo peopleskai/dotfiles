@@ -8,11 +8,16 @@ else
 fi
 
 #
+# Setup common binary paths
+#
+export PATH="/local/home/yuenton/.local/bin:$PATH"
+
+#
 # MISE Setup
 #
 
 # MISE installs tools used by rest of script. Need to run at the beginning
-eval "$(~/.local/bin/mise activate zsh)"
+eval "$(mise activate zsh)"
 
 #
 # Load ZAP plugins
