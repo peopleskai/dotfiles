@@ -418,7 +418,11 @@ vim.g.rustaceanvim = {
     default_settings = {
       ['rust-analyzer'] = {
         cargo = {
-          targetDir = true, -- use target/rust-analyzer to avoid lock contention
+          targetDir = true,
+          cfgs = { 'target_os="none"' },
+        },
+        diagnostics = {
+          disabled = { "inactive-code" },
         },
       },
     },
@@ -643,6 +647,10 @@ require('nvim-treesitter').setup({
 vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.wo[0][0].foldmethod = 'expr'
 
+-- Link the Rust question mark operator to a specific color/style
+-- "@punctuation.special" is the common group for this in Rust
+vim.api.nvim_set_hl(0, "@punctuation.special.rust", { fg = "#ff9e64", bold = true })
+
 --------------------------------------------------------------------------------
 -- AI Tool sidekick setup
 --------------------------------------------------------------------------------
@@ -660,14 +668,17 @@ local function toggle_sidekick_fullscreen(t)
 
   if is_fullscreen then
     vim.api.nvim_win_close(t.win, false)
-    t:show() -- reopen in default split layout (doesn't focus)
-    vim.api.nvim_set_current_win(t.win) -- focus back since t:show() opens with enter=false
+    t.opts.layout = t._original_layout
+    t:show()
+    vim.api.nvim_set_current_win(t.win)
     is_fullscreen = false
-    if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    vim.schedule(function()
+      if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    end)
     vim.notify("Split mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
   else
     vim.api.nvim_win_close(t.win, false)
-    t.win = vim.api.nvim_open_win(t.buf, true, { -- reopen as fullscreen float
+    t.win = vim.api.nvim_open_win(t.buf, true, {
       relative = "editor",
       row = 0,
       col = 0,
@@ -676,8 +687,11 @@ local function toggle_sidekick_fullscreen(t)
       style = "minimal",
       border = "none",
     })
+    t.opts.layout = "float"
     is_fullscreen = true
-    if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    vim.schedule(function()
+      if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+    end)
     vim.notify("Fullscreen mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
   end
 end
