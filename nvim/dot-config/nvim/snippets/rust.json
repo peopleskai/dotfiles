@@ -1,0 +1,7 @@
+{
+  "defmt println": {
+    "prefix": "dprintln",
+    "body": "defmt::println!($0);",
+    "description": "defmt::println!()"
+  }
+}

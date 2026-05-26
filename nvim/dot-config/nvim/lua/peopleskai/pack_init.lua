@@ -141,6 +141,7 @@ require('flutter-tools').setup({})
 require('fidget').setup()
 require('mason').setup()
 require('luasnip').config.setup({})
+require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.fn.stdpath('config') .. '/snippets' } })
 
 -- markdown-preview
 vim.g.mkdp_filetypes = { 'markdown' }
