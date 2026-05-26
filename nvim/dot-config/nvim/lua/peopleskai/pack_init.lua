@@ -737,10 +737,11 @@ require('sidekick').setup({
 })
 vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', function() require("sidekick.cli").focus() end, { desc = 'Sidekick Focus' })
 vim.keymap.set('n', '<leader>aa', function() require("sidekick.cli").toggle() end, { desc = 'Sidekick Toggle' })
-vim.keymap.set({ 'n', 'x' }, '<leader>at', function() require("sidekick.cli").send({ msg = "{this}" }) end, { desc = 'Sidekick Toggle' })
-vim.keymap.set('n', '<leader>af', function() require("sidekick.cli").send({ msg = "{file}" }) end, { desc = 'Sidekick Toggle' })
-vim.keymap.set('x', '<leader>av', function() require("sidekick.cli").send({ msg = "{selection}" }) end, { desc = 'Sidekick Toggle' })
-vim.keymap.set({ 'n', 'x' }, '<leader>ap', function() require("sidekick.cli").prompt() end, { desc = 'Sidekick Toggle' })
+vim.keymap.set('n', '<leader>as', function() require('sidekick.cli').select() end, { desc = 'Sidekick Select CLI' })
+vim.keymap.set({ 'n', 'x' }, '<leader>at', function() require("sidekick.cli").send({ msg = "{this}" }) end, { desc = 'Sidekick Send {this}' })
+vim.keymap.set('n', '<leader>af', function() require("sidekick.cli").send({ msg = "{file}" }) end, { desc = 'Sidekick Send {file}' })
+vim.keymap.set('x', '<leader>av', function() require("sidekick.cli").send({ msg = "{selection}" }) end, { desc = 'Sidekick Send {selection}' })
+vim.keymap.set({ 'n', 'x' }, '<leader>ap', function() require("sidekick.cli").prompt() end, { desc = 'Sidekick Select Prompt to Send' })
 
 --------------------------------------------------------------------------------
 -- mini.statusline
