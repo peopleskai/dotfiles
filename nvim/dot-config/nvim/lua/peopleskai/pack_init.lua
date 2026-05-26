@@ -712,6 +712,10 @@ require('sidekick').setup({
       }
     },
     tools = {
+      claude_yolo = {
+        cmd = { "claude", "--dangerously-skip-permissions" },
+        name = "Claude YOLO",
+      },
       kiro = {
         cmd = { "kiro-cli", "chat", "--model", "claude-opus-4.6", "--trust-all-tools" },
         name = "KiroCLI",
