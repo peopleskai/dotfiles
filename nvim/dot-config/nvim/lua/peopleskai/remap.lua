@@ -57,3 +57,39 @@ vim.keymap.set('n', '<leader>dm', function()
     },
   })
 end, { desc = '[D]iagnostic [M]essage' })
+
+-- Toggle persistent terminal split (40% height) with <C-`>
+-- Reuses the same terminal buffer so background processes survive hiding
+local term_buf = nil
+
+vim.keymap.set({'n', 't'}, '<C-`>', function()
+  -- Reset if buffer was manually deleted
+  if term_buf and not vim.api.nvim_buf_is_valid(term_buf) then
+    term_buf = nil
+  end
+
+  -- If terminal is visible, hide window (keeps buffer/process alive)
+  if term_buf then
+    local win = vim.fn.bufwinid(term_buf)
+    if win ~= -1 then
+      vim.api.nvim_win_hide(win)
+      return
+    end
+  end
+
+  -- Open bottom split at 40% screen height
+  local height = math.floor(vim.o.lines * 0.4)
+  vim.cmd('botright ' .. height .. 'split')
+
+  if term_buf then
+    -- Reuse existing terminal buffer
+    vim.api.nvim_win_set_buf(0, term_buf)
+  else
+    -- Create fresh buffer so the original file buffer isn't replaced
+    vim.cmd('enew')
+    vim.fn.termopen(vim.o.shell)
+    term_buf = vim.api.nvim_get_current_buf()
+  end
+
+  vim.cmd('startinsert')
+end, { desc = 'Toggle terminal split' })
