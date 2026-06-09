@@ -55,6 +55,11 @@ config = {
 			mods = "LEADER",
 			action = wezterm.action.CloseCurrentPane({ confirm = false }),
 		},
+		-- pane navigation
+		{ key = "h", mods = "SUPER|SHIFT", action = wezterm.action.ActivatePaneDirection("Left") },
+		{ key = "j", mods = "SUPER|SHIFT", action = wezterm.action.ActivatePaneDirection("Down") },
+		{ key = "k", mods = "SUPER|SHIFT", action = wezterm.action.ActivatePaneDirection("Up") },
+		{ key = "l", mods = "SUPER|SHIFT", action = wezterm.action.ActivatePaneDirection("Right") },
 		-- Prompt for a name to use for a new workspace and switch to it.
 		{
 			key = "W",
