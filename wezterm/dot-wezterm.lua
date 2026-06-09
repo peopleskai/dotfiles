@@ -34,7 +34,7 @@ config = {
 	--aerospace compatibility
 	window_decorations = "RESIZE",
 
-	leader = { key = "a", mods = "CTRL" },
+	leader = { key = " ", mods = "CTRL" },
 	keys = {
 		-- Make Option-<arrow equivalent to Alt-b which many line editors interpret as backward-word
 		{ key = "LeftArrow", mods = "ALT", action = wezterm.action({ SendString = "\x1bb" }) },
