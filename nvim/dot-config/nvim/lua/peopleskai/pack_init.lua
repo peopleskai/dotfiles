@@ -714,7 +714,7 @@ require('sidekick').setup({
     },
     tools = {
       claude_yolo = {
-        cmd = { "claude", "--dangerously-skip-permissions" },
+        cmd = { "claude", "--dangerously-skip-permissions", "--model", "us.anthropic.claude-opus-4-8" },
         name = "Claude YOLO",
       },
       kiro = {
