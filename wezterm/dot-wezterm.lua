@@ -264,28 +264,79 @@ config.max_fps = 120 -- Improve responsiveness
 -----------------------------------------
 -- UI not updating debugging
 -----------------------------------------
-config.front_end = "WebGpu" -- Or "OpenGL"
-config.webgpu_power_preference = "HighPerformance"
+-- config.front_end = "OpenGL" -- WebGpu or OpenGL
+-- config.webgpu_power_preference = "HighPerformance"
 
 -----------------------------------------
 -- Tab name
 -----------------------------------------
 wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-	local pane = tab.active_pane
-	local title = pane.title
-	-- If in a multiplexed domain, you might want to prefix it
-	if pane.domain_name ~= "local" then
-		title = "🔗 " .. pane.domain_name
-	end
-	return title
+  if tab.tab_title and #tab.tab_title > 0 then
+    return tab.tab_title
+  end
+  local pane = tab.active_pane
+  local title = pane.title
+  if pane.domain_name ~= "local" then
+    title = "🔗 " .. pane.domain_name
+  end
+  return title
 end)
 
 wezterm.on("update-status", function(window, pane)
-	local meta = pane:get_metadata() or {}
-	if meta.is_tardy then
-		local secs = meta.since_last_response_ms / 1000.0
-		window:set_right_status(string.format("tardy: %5.1fs⏳", secs))
-	end
+  local meta = pane:get_metadata() or {}
+  if meta.is_tardy then
+    local secs = meta.since_last_response_ms / 1000.0
+    window:set_right_status(string.format("tardy: %5.1fs⏳", secs))
+  end
+end)
+
+-----------------------------------------
+-- Session Manager
+-----------------------------------------
+local session_manager = require("wezterm-session-manager/session-manager")
+wezterm.on("save_session", function(window)
+  session_manager.save_state(window)
+end)
+wezterm.on("load_session", function(window)
+  session_manager.load_state(window)
+end)
+wezterm.on("restore_session", function(window)
+  session_manager.restore_state(window)
+end)
+
+-----------------------------------------
+-- Command Palette Commnads
+-----------------------------------------
+wezterm.on("augment-command-palette", function(window, pane)
+  return {
+    {
+      brief = "Rename tab",
+      icon = "md_rename_box",
+      action = wezterm.action.PromptInputLine({
+        description = "Enter new name for tab",
+        action = wezterm.action_callback(function(window, pane, line)
+          if line then
+            window:active_tab():set_title(line)
+          end
+        end),
+      }),
+    },
+    {
+      brief = "Save session",
+      icon = "md_rename_box",
+      action = wezterm.action({ EmitEvent = "save_session" }),
+    },
+    {
+      brief = "Load session",
+      icon = "md_rename_box",
+      action = wezterm.action({ EmitEvent = "load_session" }),
+    },
+    {
+      brief = "Restore session",
+      icon = "md_rename_box",
+      action = wezterm.action({ EmitEvent = "restore_session" }),
+    },
+  }
 end)
 
 return config
