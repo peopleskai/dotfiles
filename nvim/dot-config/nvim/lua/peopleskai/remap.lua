@@ -68,11 +68,16 @@ vim.keymap.set({'n', 't'}, '<C-`>', function()
     term_buf = nil
   end
 
-  -- If terminal is visible, hide window (keeps buffer/process alive)
+  -- If terminal is visible, focus it or hide it
   if term_buf then
     local win = vim.fn.bufwinid(term_buf)
     if win ~= -1 then
-      vim.api.nvim_win_hide(win)
+      if vim.api.nvim_get_current_win() == win then
+        vim.api.nvim_win_hide(win)
+      else
+        vim.api.nvim_set_current_win(win)
+        vim.cmd('startinsert')
+      end
       return
     end
   end
@@ -87,7 +92,7 @@ vim.keymap.set({'n', 't'}, '<C-`>', function()
   else
     -- Create fresh buffer so the original file buffer isn't replaced
     vim.cmd('enew')
-    vim.fn.termopen(vim.o.shell)
+    vim.fn.termopen(vim.o.shell, { cwd = vim.fn.getcwd(-1) })
     term_buf = vim.api.nvim_get_current_buf()
   end
 
