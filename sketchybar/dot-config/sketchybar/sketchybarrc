@@ -1,0 +1,51 @@
+#!/bin/bash
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+
+##### Bar Appearance #####
+sketchybar --bar \
+  height=32 \
+  blur_radius=30 \
+  position=top \
+  sticky=on \
+  padding_left=10 \
+  padding_right=10 \
+  color=0xd91a1b26 \
+  border_color=0xd933467c \
+  border_width=1 \
+  corner_radius=0 \
+  y_offset=0
+
+##### Default Values (Tokyo Night) #####
+sketchybar --default \
+  icon.font="JetBrainsMono Nerd Font:Bold:14.0" \
+  icon.color=0xffc0caf5 \
+  label.font="JetBrainsMono Nerd Font:Regular:13.0" \
+  label.color=0xffc0caf5 \
+  padding_left=4 \
+  padding_right=4 \
+  icon.padding_left=6 \
+  icon.padding_right=4 \
+  label.padding_left=4 \
+  label.padding_right=6 \
+  background.color=0xd91a1b26 \
+  background.corner_radius=5 \
+  background.height=24
+
+##### Custom Events #####
+sketchybar --add event aerospace_workspace_change
+
+##### Left Side: Aerospace Workspaces #####
+source "$ITEM_DIR/aerospace.sh"
+
+##### Right Side Items (right-to-left order) #####
+source "$ITEM_DIR/clock.sh"
+source "$ITEM_DIR/mail.sh"
+source "$ITEM_DIR/slack.sh"
+source "$ITEM_DIR/disk.sh"
+source "$ITEM_DIR/amphetamine.sh"
+source "$ITEM_DIR/volume.sh"
+source "$ITEM_DIR/audio_device.sh"
+
+sketchybar --update

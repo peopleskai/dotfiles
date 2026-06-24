@@ -18,6 +18,10 @@ after-startup-command = [
   # 'exec-and-forget borders active_color=0xffe2e2e3 inactive_color=0xff414550 width=6.0 style=round hidpi=off',
 ]
 
+exec-on-workspace-change = ['/bin/bash', '-c',
+  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
+]
+
 # Start AeroSpace at login
 start-at-login = true
 
@@ -63,7 +67,7 @@ inner.horizontal = 10
 inner.vertical = 10
 outer.left = 10
 outer.bottom = 10
-outer.top = 10
+outer.top = 40
 outer.right = 10
 
 # Assign workspaces to monitor
