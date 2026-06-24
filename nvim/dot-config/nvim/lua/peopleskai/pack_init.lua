@@ -724,14 +724,6 @@ require('sidekick').setup({
       kiro_sisyphus = {
         cmd = { "kiro-cli", "chat", "--agent", "sisyphus", "--trust-all-tools" },
         name = "KiroCLI Sisyphus",
-        -- Optional: custom keymaps for this tool
-        -- keys = {
-        --   submit = { "<c-s>", function(t) t:send("\n") end },
-        -- },
-      },
-      kiro_sisyphus_2 = {
-        cmd = { "kiro-cli", "chat", "--agent", "sisyphus", "--trust-all-tools" },
-        name = "KiroCLI Sisyphus",
       },
     },
   }
