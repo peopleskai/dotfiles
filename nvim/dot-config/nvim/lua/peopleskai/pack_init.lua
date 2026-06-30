@@ -40,7 +40,7 @@ local plugins = {
   gh('MunifTanjim/nui.nvim'),
 
   -- Colorscheme
-  gh('folke/tokyonight'),
+  gh('folke/tokyonight.nvim'),
 
   -- UI
   gh('echasnovski/mini.statusline'),
@@ -125,7 +125,7 @@ end
 vim.pack.add(plugins)
 
 -- Set color scheme/theme
-vim.cmd([[colorscheme tokyonight]])
+vim.cmd([[colorscheme tokyonight-night]])
 
 vim.api.nvim_create_autocmd('FocusGained', {
   callback = function()
