@@ -15,11 +15,13 @@ after-login-command = []
 after-startup-command = [
   # JankyBorders has a built-in detection of already running process,
   # so it won't be run twice on AeroSpace restart
-  # 'exec-and-forget borders active_color=0xffe2e2e3 inactive_color=0xff414550 width=6.0 style=round hidpi=off',
+  'exec-and-forget borders active_color=0xffe2e2e3 inactive_color=0xff414550 width=6.0 style=round hidpi=off',
 ]
 
-exec-on-workspace-change = ['/bin/bash', '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
 ]
 
 # Start AeroSpace at login
