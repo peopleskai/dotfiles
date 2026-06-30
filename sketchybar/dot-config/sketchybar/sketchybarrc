@@ -44,7 +44,7 @@ source "$ITEM_DIR/clock.sh"
 source "$ITEM_DIR/mail.sh"
 source "$ITEM_DIR/slack.sh"
 source "$ITEM_DIR/disk.sh"
-source "$ITEM_DIR/amphetamine.sh"
+source "$ITEM_DIR/caffeinate.sh"
 source "$ITEM_DIR/volume.sh"
 source "$ITEM_DIR/audio_device.sh"
 
