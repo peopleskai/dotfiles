@@ -40,7 +40,7 @@ local plugins = {
   gh('MunifTanjim/nui.nvim'),
 
   -- Colorscheme
-  gh('deparr/tairiki.nvim'),
+  gh('folke/tokyonight'),
 
   -- UI
   gh('echasnovski/mini.statusline'),
@@ -124,25 +124,8 @@ end
 
 vim.pack.add(plugins)
 
--- Dynamic theme following macOS system appearance
-local function get_system_appearance()
-  local result = vim.system({ 'defaults', 'read', '-g', 'AppleInterfaceStyle' }, { text = true }):wait()
-  if result.code == 0 and result.stdout:match('Dark') then
-    return 'dark'
-  end
-  return 'light'
-end
-
-local function apply_theme()
-  local palette = get_system_appearance()
-  vim.o.background = palette
-  require('tairiki').setup({ palette = palette, transparent = true })
-  vim.cmd.colorscheme('tairiki')
-  vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
-  vim.api.nvim_set_hl(0, 'FloatBorder', { bg = 'NONE' })
-end
-
-apply_theme()
+-- Set color scheme/theme
+vim.cmd([[colorscheme tokyonight]])
 
 vim.api.nvim_create_autocmd('FocusGained', {
   callback = function()
