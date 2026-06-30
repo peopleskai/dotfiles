@@ -40,7 +40,7 @@ local plugins = {
   gh('MunifTanjim/nui.nvim'),
 
   -- Colorscheme
-  gh('folke/tokyonight.nvim'),
+  gh('deparr/tairiki.nvim'),
 
   -- UI
   gh('echasnovski/mini.statusline'),
@@ -111,7 +111,10 @@ local plugins = {
   { src = gh('nvim-treesitter/nvim-treesitter'), version = 'main' },
 
   -- AI tools
-  gh('folke/sidekick.nvim')
+  gh('folke/sidekick.nvim'),
+
+  -- Kitty motion
+  gh('knubie/vim-kitty-navigator'),
 }
 
 -- NinjaHooks: Amazon Brazil Config LSP (conditional)
@@ -121,16 +124,31 @@ end
 
 vim.pack.add(plugins)
 
---------------------------------------------------------------------------------
--- Plugin Configuration (tokyonight FIRST — was priority 1000)
---------------------------------------------------------------------------------
+-- Dynamic theme following macOS system appearance
+local function get_system_appearance()
+  local result = vim.system({ 'defaults', 'read', '-g', 'AppleInterfaceStyle' }, { text = true }):wait()
+  if result.code == 0 and result.stdout:match('Dark') then
+    return 'dark'
+  end
+  return 'light'
+end
 
--- Colorscheme
-require('tokyonight').setup({
-  transparent = true,
-  terminal_colors = true,
+local function apply_theme()
+  local palette = get_system_appearance()
+  vim.o.background = palette
+  require('tairiki').setup({ palette = palette, transparent = true })
+  vim.cmd.colorscheme('tairiki')
+  vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
+  vim.api.nvim_set_hl(0, 'FloatBorder', { bg = 'NONE' })
+end
+
+apply_theme()
+
+vim.api.nvim_create_autocmd('FocusGained', {
+  callback = function()
+    apply_theme()
+  end,
 })
-vim.cmd([[colorscheme tokyonight]])
 
 -- Simple setups
 require('todo-comments').setup()
@@ -423,7 +441,7 @@ vim.g.rustaceanvim = {
           cfgs = { 'target_os="none"' },
         },
         diagnostics = {
-          disabled = { "inactive-code" },
+          disabled = { 'inactive-code' },
         },
       },
     },
@@ -440,31 +458,65 @@ vim.api.nvim_create_autocmd('FileType', {
     end
 
     -- Override generic LSP keymaps with rustaceanvim enhanced versions
-    map('K', function() vim.cmd.RustLsp({ 'hover', 'actions' }) end, 'Hover Actions')
-    map('<leader>ca', function() vim.cmd.RustLsp('codeAction') end, 'Code Action (grouped)')
+    map('K', function()
+      vim.cmd.RustLsp({ 'hover', 'actions' })
+    end, 'Hover Actions')
+    map('<leader>ca', function()
+      vim.cmd.RustLsp('codeAction')
+    end, 'Code Action (grouped)')
 
     -- Diagnostics
-    map(']d', function() vim.cmd.RustLsp({ 'renderDiagnostic', 'cycle' }) end, 'Next Rendered Diagnostic')
-    map('[d', function() vim.cmd.RustLsp({ 'renderDiagnostic', 'cycle_prev' }) end, 'Prev Rendered Diagnostic')
-    map('<leader>ee', function() vim.cmd.RustLsp({ 'explainError', 'cycle' }) end, 'Explain Error')
+    map(']d', function()
+      vim.cmd.RustLsp({ 'renderDiagnostic', 'cycle' })
+    end, 'Next Rendered Diagnostic')
+    map('[d', function()
+      vim.cmd.RustLsp({ 'renderDiagnostic', 'cycle_prev' })
+    end, 'Prev Rendered Diagnostic')
+    map('<leader>ee', function()
+      vim.cmd.RustLsp({ 'explainError', 'cycle' })
+    end, 'Explain Error')
 
     -- Run / Test / Debug
-    map('<leader>rr', function() vim.cmd.RustLsp('runnables') end, 'Runnables')
-    map('<leader>rt', function() vim.cmd.RustLsp('testables') end, 'Testables')
-    map('<leader>rl', function() vim.cmd.RustLsp({ 'runnables', bang = true }) end, 'Rerun Last')
-    map('<leader>rd', function() vim.cmd.RustLsp('debuggables') end, 'Debuggables')
-    map('<leader>re', function() vim.cmd.RustLsp('relatedTests') end, 'Related Tests')
+    map('<leader>rr', function()
+      vim.cmd.RustLsp('runnables')
+    end, 'Runnables')
+    map('<leader>rt', function()
+      vim.cmd.RustLsp('testables')
+    end, 'Testables')
+    map('<leader>rl', function()
+      vim.cmd.RustLsp({ 'runnables', bang = true })
+    end, 'Rerun Last')
+    map('<leader>rd', function()
+      vim.cmd.RustLsp('debuggables')
+    end, 'Debuggables')
+    map('<leader>re', function()
+      vim.cmd.RustLsp('relatedTests')
+    end, 'Related Tests')
 
     -- Navigation
-    map('<leader>pm', function() vim.cmd.RustLsp('parentModule') end, 'Parent Module')
-    map('<leader>oc', function() vim.cmd.RustLsp('openCargo') end, 'Open Cargo.toml')
-    map('<leader>od', function() vim.cmd.RustLsp('openDocs') end, 'Open docs.rs')
+    map('<leader>pm', function()
+      vim.cmd.RustLsp('parentModule')
+    end, 'Parent Module')
+    map('<leader>oc', function()
+      vim.cmd.RustLsp('openCargo')
+    end, 'Open Cargo.toml')
+    map('<leader>od', function()
+      vim.cmd.RustLsp('openDocs')
+    end, 'Open docs.rs')
 
     -- Code manipulation
-    map('<leader>em', function() vim.cmd.RustLsp('expandMacro') end, 'Expand Macro')
-    map('J', function() vim.cmd.RustLsp('joinLines') end, 'Smart Join Lines')
-    map('<leader>mk', function() vim.cmd.RustLsp({ 'moveItem', 'up' }) end, 'Move Item Up')
-    map('<leader>mj', function() vim.cmd.RustLsp({ 'moveItem', 'down' }) end, 'Move Item Down')
+    map('<leader>em', function()
+      vim.cmd.RustLsp('expandMacro')
+    end, 'Expand Macro')
+    map('J', function()
+      vim.cmd.RustLsp('joinLines')
+    end, 'Smart Join Lines')
+    map('<leader>mk', function()
+      vim.cmd.RustLsp({ 'moveItem', 'up' })
+    end, 'Move Item Up')
+    map('<leader>mj', function()
+      vim.cmd.RustLsp({ 'moveItem', 'down' })
+    end, 'Move Item Down')
   end,
 })
 
@@ -650,7 +702,7 @@ vim.wo[0][0].foldmethod = 'expr'
 
 -- Link the Rust question mark operator to a specific color/style
 -- "@punctuation.special" is the common group for this in Rust
-vim.api.nvim_set_hl(0, "@punctuation.special.rust", { fg = "#ff9e64", bold = true })
+vim.api.nvim_set_hl(0, '@punctuation.special.rust', { fg = '#ff9e64', bold = true })
 
 --------------------------------------------------------------------------------
 -- AI Tool sidekick setup
@@ -661,7 +713,7 @@ local is_fullscreen = false
 ---@param t sidekick.cli.Terminal
 local function toggle_sidekick_fullscreen(t)
   if not t:win_valid() then
-    vim.notify("Sidekick CLI window not found", vim.log.levels.WARN, { title = "Sidekick" })
+    vim.notify('Sidekick CLI window not found', vim.log.levels.WARN, { title = 'Sidekick' })
     return
   end
 
@@ -674,26 +726,34 @@ local function toggle_sidekick_fullscreen(t)
     vim.api.nvim_set_current_win(t.win)
     is_fullscreen = false
     vim.schedule(function()
-      if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+      if was_insert then
+        vim.cmd('startinsert')
+      else
+        vim.cmd('stopinsert')
+      end
     end)
-    vim.notify("Split mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
+    vim.notify('Split mode', vim.log.levels.INFO, { title = 'Sidekick CLI' })
   else
     vim.api.nvim_win_close(t.win, false)
     t.win = vim.api.nvim_open_win(t.buf, true, {
-      relative = "editor",
+      relative = 'editor',
       row = 0,
       col = 0,
       width = vim.o.columns,
       height = vim.o.lines - 3,
-      style = "minimal",
-      border = "none",
+      style = 'minimal',
+      border = 'none',
     })
-    t.opts.layout = "float"
+    t.opts.layout = 'float'
     is_fullscreen = true
     vim.schedule(function()
-      if was_insert then vim.cmd('startinsert') else vim.cmd('stopinsert') end
+      if was_insert then
+        vim.cmd('startinsert')
+      else
+        vim.cmd('stopinsert')
+      end
     end)
-    vim.notify("Fullscreen mode", vim.log.levels.INFO, { title = "Sidekick CLI" })
+    vim.notify('Fullscreen mode', vim.log.levels.INFO, { title = 'Sidekick CLI' })
   end
 end
 
@@ -705,36 +765,50 @@ require('sidekick').setup({
         -- add fullscreen toggle
         toggle_fullscreen = {
           '<c-\\>',
-          function (t)
+          function(t)
             toggle_sidekick_fullscreen(t)
           end,
           mode = 'nt',
-        }
-      }
+        },
+      },
     },
     tools = {
       claude_yolo = {
-        cmd = { "claude", "--dangerously-skip-permissions", "--model", "us.anthropic.claude-opus-4-8" },
-        name = "Claude YOLO",
+        cmd = { 'claude', '--dangerously-skip-permissions', '--model', 'us.anthropic.claude-opus-4-8' },
+        name = 'Claude YOLO',
       },
       kiro = {
-        cmd = { "kiro-cli", "chat", "--model", "claude-opus-4.6", "--trust-all-tools" },
-        name = "KiroCLI",
+        cmd = { 'kiro-cli', 'chat', '--model', 'claude-opus-4.6', '--trust-all-tools' },
+        name = 'KiroCLI',
       },
       kiro_sisyphus = {
-        cmd = { "kiro-cli", "chat", "--agent", "sisyphus", "--trust-all-tools" },
-        name = "KiroCLI Sisyphus",
+        cmd = { 'kiro-cli', 'chat', '--agent', 'sisyphus', '--trust-all-tools' },
+        name = 'KiroCLI Sisyphus',
       },
     },
-  }
+  },
 })
-vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', function() require("sidekick.cli").focus() end, { desc = 'Sidekick Focus' })
-vim.keymap.set('n', '<leader>aa', function() require("sidekick.cli").toggle() end, { desc = 'Sidekick Toggle' })
-vim.keymap.set('n', '<leader>as', function() require('sidekick.cli').select() end, { desc = 'Sidekick Select CLI' })
-vim.keymap.set({ 'n', 'x' }, '<leader>at', function() require("sidekick.cli").send({ msg = "{this}" }) end, { desc = 'Sidekick Send {this}' })
-vim.keymap.set('n', '<leader>af', function() require("sidekick.cli").send({ msg = "{file}" }) end, { desc = 'Sidekick Send {file}' })
-vim.keymap.set('x', '<leader>av', function() require("sidekick.cli").send({ msg = "{selection}" }) end, { desc = 'Sidekick Send {selection}' })
-vim.keymap.set({ 'n', 'x' }, '<leader>ap', function() require("sidekick.cli").prompt() end, { desc = 'Sidekick Select Prompt to Send' })
+vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', function()
+  require('sidekick.cli').focus()
+end, { desc = 'Sidekick Focus' })
+vim.keymap.set('n', '<leader>aa', function()
+  require('sidekick.cli').toggle()
+end, { desc = 'Sidekick Toggle' })
+vim.keymap.set('n', '<leader>as', function()
+  require('sidekick.cli').select()
+end, { desc = 'Sidekick Select CLI' })
+vim.keymap.set({ 'n', 'x' }, '<leader>at', function()
+  require('sidekick.cli').send({ msg = '{this}' })
+end, { desc = 'Sidekick Send {this}' })
+vim.keymap.set('n', '<leader>af', function()
+  require('sidekick.cli').send({ msg = '{file}' })
+end, { desc = 'Sidekick Send {file}' })
+vim.keymap.set('x', '<leader>av', function()
+  require('sidekick.cli').send({ msg = '{selection}' })
+end, { desc = 'Sidekick Send {selection}' })
+vim.keymap.set({ 'n', 'x' }, '<leader>ap', function()
+  require('sidekick.cli').prompt()
+end, { desc = 'Sidekick Select Prompt to Send' })
 
 --------------------------------------------------------------------------------
 -- mini.statusline
@@ -744,23 +818,23 @@ require('mini.statusline').setup({
     active = function()
       local MiniStatusline = require('mini.statusline')
       local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
-      local git           = MiniStatusline.section_git({ trunc_width = 40 })
-      local diff          = MiniStatusline.section_diff({ trunc_width = 75 })
-      local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-      local lsp           = MiniStatusline.section_lsp({ trunc_width = 75 })
-      local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
-      local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-      local location      = MiniStatusline.section_location({ trunc_width = 75 })
-      local search        = MiniStatusline.section_searchcount({ trunc_width = 75 })
+      local git = MiniStatusline.section_git({ trunc_width = 40 })
+      local diff = MiniStatusline.section_diff({ trunc_width = 75 })
+      local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+      local lsp = MiniStatusline.section_lsp({ trunc_width = 75 })
+      local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+      local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+      local location = MiniStatusline.section_location({ trunc_width = 75 })
+      local search = MiniStatusline.section_searchcount({ trunc_width = 75 })
 
       return MiniStatusline.combine_groups({
-        { hl = mode_hl,                  strings = { mode } },
-        { hl = 'MiniStatuslineDevinfo',  strings = { git, diff, diagnostics, lsp } },
+        { hl = mode_hl, strings = { mode } },
+        { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
         '%<',
         { hl = 'MiniStatuslineFilename', strings = { filename } },
         '%=',
         { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-        { hl = mode_hl,                  strings = { search, location } },
+        { hl = mode_hl, strings = { search, location } },
       })
     end,
   },
