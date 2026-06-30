@@ -3,8 +3,10 @@
 APP_NAME="$1"
 
 case "$APP_NAME" in
-"Ghostty" | "Terminal" | "iTerm2" | "WezTerm" | "Alacritty" | "kitty")
+"Ghostty" | "Terminal" | "iTerm2" | "WezTerm" | "Alacritty")
   ICON="" ;;
+"kitty")
+  ICON="󰄛" ;;
 "Finder")
   ICON="󰀶" ;;
 "Firefox")
