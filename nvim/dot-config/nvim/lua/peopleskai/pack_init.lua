@@ -127,12 +127,6 @@ vim.pack.add(plugins)
 -- Set color scheme/theme
 vim.cmd([[colorscheme tokyonight-night]])
 
-vim.api.nvim_create_autocmd('FocusGained', {
-  callback = function()
-    apply_theme()
-  end,
-})
-
 -- Simple setups
 require('todo-comments').setup()
 require('marks').setup()
@@ -744,6 +738,7 @@ require('sidekick').setup({
   nes = { enabled = false },
   cli = {
     win = {
+      wo = { winblend = 25 },
       keys = {
         -- add fullscreen toggle
         toggle_fullscreen = {
