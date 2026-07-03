@@ -1,0 +1,62 @@
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"horizontal": false, "one": 2}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [3, 2], "window_groups": [{"id": 2, "window_ids": [3]}]}}
+cd /Users/yuenton/.unison
+
+launch 'kitty-unserialize-data={"id": 3}' --var=IS_VIM=false
+focus
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"horizontal": false, "one": 4}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [11, 4], "window_groups": [{"id": 4, "window_ids": [5]}]}}
+cd /Users/yuenton/.unison
+
+launch 'kitty-unserialize-data={"id": 5, "cmd_at_shell_startup": "kitten ssh cloud-merlin.hugo_v2_pmic"}' --var=IS_VIM=true
+focus
+
+focus_tab 3
+
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"one": 1}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [1], "window_groups": [{"id": 1, "window_ids": [1]}]}}
+cd /Users/yuenton
+
+launch 'kitty-unserialize-data={"id": 1}'
+focus
+
+focus_tab 3
+
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"one": 14}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [14], "window_groups": [{"id": 14, "window_ids": [27]}]}}
+cd /Users/yuenton/repos/dotfiles/kitty/dot-config
+
+launch 'kitty-unserialize-data={"id": 27, "cmd_at_shell_startup": "ls"}' --var=IS_VIM=false
+focus
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"horizontal": false, "one": 6}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [10, 6], "window_groups": [{"id": 6, "window_ids": [8]}]}}
+cd /Users/yuenton/repos/dotfiles
+
+launch 'kitty-unserialize-data={"id": 8, "cmd_at_shell_startup": "kitten ssh cloud-merlin.dotfiles"}'
+focus
+
+new_tab
+layout splits
+enabled_layouts splits,stack
+set_layout_state {"pairs": {"one": 7}, "opts": {"split_axis": "horizontal", "equalize_on_window_close": "n"}, "class": "Splits", "all_windows": {"active_group_idx": 0, "active_group_history": [], "window_groups": [{"id": 7, "window_ids": [9]}]}}
+cd /Users/yuenton/repos/dotfiles
+
+launch 'kitty-unserialize-data={"id": 9}' --var=IS_VIM=false
+focus
+
+focus_tab 3
