@@ -17,10 +17,6 @@ vim.api.nvim_create_autocmd('PackChanged', {
       vim.system({ 'yarn', 'install' }, { cwd = path .. '/app' })
     elseif name == 'telescope-fzf-native.nvim' then
       vim.system({ 'make' }, { cwd = path })
-    elseif name == 'LuaSnip' then
-      if vim.fn.has('win32') == 0 and vim.fn.executable('make') == 1 then
-        vim.system({ 'make', 'install_jsregexp' }, { cwd = path })
-      end
     elseif name == 'nvim-treesitter' then
       if not ev.data.active then
         vim.cmd.packadd('nvim-treesitter')
@@ -82,14 +78,9 @@ local plugins = {
   gh('WhoIsSethDaniel/mason-tool-installer.nvim'),
   gh('mfussenegger/nvim-jdtls'),
 
-  -- Completion (sources before nvim-cmp, LuaSnip before cmp_luasnip)
-  gh('hrsh7th/cmp-nvim-lsp'),
-  gh('hrsh7th/cmp-path'),
-  gh('ray-x/cmp-treesitter'),
+  -- Completion (blink.cmp: pin to 1.x so the prebuilt fuzzy binary is fetched)
   gh('rafamadriz/friendly-snippets'),
-  gh('L3MON4D3/LuaSnip'),
-  gh('saadparwaiz1/cmp_luasnip'),
-  gh('hrsh7th/nvim-cmp'),
+  { src = gh('saghen/blink.cmp'), version = vim.version.range('1') },
 
   -- Rust
   {
@@ -99,11 +90,8 @@ local plugins = {
     version = vim.version.range('^9'),
   },
 
-  -- Lua dev
+  -- Lua LSP
   gh('folke/lazydev.nvim'),
-
-  -- Flutter
-  gh('akinsho/flutter-tools.nvim'),
 
   -- Treesitter (deps before main)
   gh('nvim-treesitter/nvim-treesitter-textobjects'),
@@ -132,11 +120,8 @@ require('todo-comments').setup()
 require('marks').setup()
 require('nvim-surround').setup({})
 require('nvim-autopairs').setup()
-require('flutter-tools').setup({})
 require('fidget').setup()
 require('mason').setup()
-require('luasnip').config.setup({})
-require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.fn.stdpath('config') .. '/snippets' } })
 
 -- markdown-preview
 vim.g.mkdp_filetypes = { 'markdown' }
@@ -497,9 +482,48 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- Capabilities extended with cmp_nvim_lsp
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+--------------------------------------------------------------------------------
+-- blink.cmp
+--------------------------------------------------------------------------------
+local blink = require('blink.cmp')
+
+blink.setup({
+  -- Keymap mirrors the previous nvim-cmp bindings.
+  keymap = {
+    preset = 'none',
+    ['<C-n>'] = { 'select_next', 'fallback' },
+    ['<C-p>'] = { 'select_prev', 'fallback' },
+    ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
+    ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+    ['<C-y>'] = { 'select_and_accept', 'fallback' },
+    ['<C-Space>'] = { 'show', 'show_documentation', 'hide_documentation', 'fallback' },
+    ['<C-l>'] = { 'snippet_forward', 'fallback' },
+    ['<C-h>'] = { 'snippet_backward', 'fallback' },
+  },
+  appearance = { nerd_font_variant = 'mono' },
+  -- Native vim.snippet engine; friendly-snippets + custom VSCode snippets in
+  -- stdpath('config')/snippets are picked up automatically.
+  snippets = { preset = 'default' },
+  completion = {
+    documentation = { auto_show = true, auto_show_delay_ms = 200 },
+    menu = { auto_show = true },
+  },
+  sources = {
+    default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev' },
+    providers = {
+      -- lazydev completions replace LSP so they rank higher and dedupe.
+      lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink', score_offset = 100 },
+    },
+  },
+  -- Rust fuzzy matcher from the prebuilt binary shipped with the tagged release.
+  fuzzy = { implementation = 'prefer_rust_with_warning' },
+  -- blink's built-in auto_brackets (on by default) inserts brackets on confirm
+  -- for callables, replacing the old nvim-autopairs cmp confirm_done hook.
+  signature = { enabled = true },
+})
+
+-- blink.get_lsp_capabilities() is used below to advertise completion
+-- capabilities to every LSP server.
 
 -- bemol: gathers bemol-generated workspace folders for Kotlin LSP
 local function bemol()
@@ -527,7 +551,6 @@ local servers = {
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
     root_markers = { '.luarc.json', '.luarc.jsonc', '.stylua.toml', '.git' },
-    capabilities = capabilities,
     settings = { Lua = { completion = { callSnippet = 'Replace' } } },
   },
   clangd = {
@@ -538,7 +561,6 @@ local servers = {
   jsonls = {
     cmd = { 'vscode-json-language-server', '--stdio' },
     filetypes = { 'json', 'jsonc' },
-    capabilities = capabilities,
   },
   -- rust_analyzer: managed by rustaceanvim, do not configure here
   cmake = { cmd = { 'cmake-language-server' }, filetypes = { 'cmake' }, root_markers = { 'CMakeLists.txt', '.git' } },
@@ -568,57 +590,13 @@ end
 
 local servers_to_enable = {}
 for name, config in pairs(servers) do
+  -- Advertise blink.cmp's completion capabilities to every server, merging on
+  -- top of any per-server capabilities already set.
+  config.capabilities = blink.get_lsp_capabilities(config.capabilities)
   vim.lsp.config(name, config)
   table.insert(servers_to_enable, name)
 end
 vim.lsp.enable(servers_to_enable)
-
---------------------------------------------------------------------------------
--- nvim-cmp
---------------------------------------------------------------------------------
-do
-  local cmp = require('cmp')
-  local luasnip = require('luasnip')
-
-  cmp.setup({
-    snippet = {
-      expand = function(args)
-        luasnip.lsp_expand(args.body)
-      end,
-    },
-    completion = { completeopt = 'menu,menuone,noinsert' },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-n>'] = cmp.mapping.select_next_item(),
-      ['<C-p>'] = cmp.mapping.select_prev_item(),
-      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
-      ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-      ['<C-Space>'] = cmp.mapping.complete({}),
-      ['<C-l>'] = cmp.mapping(function()
-        if luasnip.expand_or_locally_jumpable() then
-          luasnip.expand_or_jump()
-        end
-      end, { 'i', 's' }),
-      ['<C-h>'] = cmp.mapping(function()
-        if luasnip.locally_jumpable(-1) then
-          luasnip.jump(-1)
-        end
-      end, { 'i', 's' }),
-    }),
-    sources = {
-      { name = 'lazydev', group_index = 0 },
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'path' },
-      { name = 'buffer' },
-      { name = 'treesitter' },
-    },
-  })
-
-  -- Autopairs integration
-  local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-  cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
-end
 
 --------------------------------------------------------------------------------
 -- lazydev.nvim to configure Lua LS
