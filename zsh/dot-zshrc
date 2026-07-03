@@ -19,6 +19,7 @@ plug "zap-zsh/supercharge"
 plug "zsh-users/zsh-syntax-highlighting"
 plug "zap-zsh/sudo"
 plug "zap-zsh/exa"
+plug "wbingli/zsh-claudecode-completion"
 
 # Tools require compinit to be runned before it can initialize auto complete
 # Load and initialise completion system
