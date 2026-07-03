@@ -1,13 +1,4 @@
 #
-# HomeBrew setup
-#
-if [ ! -f ~/.homebrewrc ]; then
-    echo "No '~/.homebrewrc' found! Setup will not work correctly!!!"
-else
-    source ~/.homebrewrc
-fi
-
-#
 # Setup common binary paths
 #
 export PATH="/local/home/yuenton/.local/bin:$PATH"
