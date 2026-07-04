@@ -662,67 +662,33 @@ vim.api.nvim_set_hl(0, '@punctuation.special.rust', { fg = '#ff9e64', bold = tru
 --------------------------------------------------------------------------------
 -- AI Tool sidekick setup
 --------------------------------------------------------------------------------
-local is_fullscreen = false
-
---- Toggle sidekick CLI between fullscreen float and default split, preserving vim mode.
+--- Toggle the sidekick CLI terminal between float and sidebar (right split).
+--- sidekick has no runtime layout setter, so we flip opts.layout then hide/show
+--- to re-open the window with the new layout, preserving focus.
 ---@param t sidekick.cli.Terminal
-local function toggle_sidekick_fullscreen(t)
-  if not t:win_valid() then
-    vim.notify('Sidekick CLI window not found', vim.log.levels.WARN, { title = 'Sidekick' })
-    return
-  end
-
-  local was_insert = vim.fn.mode():match('^[it]') ~= nil
-
-  if is_fullscreen then
-    vim.api.nvim_win_close(t.win, false)
-    t.opts.layout = t._original_layout
-    t:show()
-    vim.api.nvim_set_current_win(t.win)
-    is_fullscreen = false
-    vim.schedule(function()
-      if was_insert then
-        vim.cmd('startinsert')
-      else
-        vim.cmd('stopinsert')
-      end
-    end)
-    vim.notify('Split mode', vim.log.levels.INFO, { title = 'Sidekick CLI' })
-  else
-    vim.api.nvim_win_close(t.win, false)
-    t.win = vim.api.nvim_open_win(t.buf, true, {
-      relative = 'editor',
-      row = 0,
-      col = 0,
-      width = vim.o.columns,
-      height = vim.o.lines - 3,
-      style = 'minimal',
-      border = 'none',
-    })
-    t.opts.layout = 'float'
-    is_fullscreen = true
-    vim.schedule(function()
-      if was_insert then
-        vim.cmd('startinsert')
-      else
-        vim.cmd('stopinsert')
-      end
-    end)
-    vim.notify('Fullscreen mode', vim.log.levels.INFO, { title = 'Sidekick CLI' })
-  end
+local function toggle_sidekick_layout(t)
+  t.opts.layout = t:is_float() and 'right' or 'float'
+  t:hide()
+  t:show()
+  vim.schedule(function()
+    t:focus()
+  end)
 end
 
 require('sidekick').setup({
   nes = { enabled = false },
   cli = {
     win = {
-      wo = { winblend = 25 },
+      layout = 'right',
+      -- 0.93 opacity for both float and split (winblend is inverse of opacity;
+      -- no true blur is possible in a terminal UI).
+      wo = { winblend = 7 },
       keys = {
-        -- add fullscreen toggle
-        toggle_fullscreen = {
-          '<c-\\>',
+        -- toggle between float and sidebar layouts
+        toggle_layout = {
+          '<c-,>',
           function(t)
-            toggle_sidekick_fullscreen(t)
+            toggle_sidekick_layout(t)
           end,
           mode = 'nt',
         },
@@ -745,8 +711,8 @@ require('sidekick').setup({
   },
 })
 vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', function()
-  require('sidekick.cli').focus()
-end, { desc = 'Sidekick Focus' })
+  require('sidekick.cli').toggle()
+end, { desc = 'Sidekick Toggle' })
 vim.keymap.set('n', '<leader>aa', function()
   require('sidekick.cli').toggle()
 end, { desc = 'Sidekick Toggle' })
