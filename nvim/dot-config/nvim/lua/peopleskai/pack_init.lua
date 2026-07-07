@@ -101,8 +101,8 @@ local plugins = {
   -- AI tools
   gh('folke/sidekick.nvim'),
 
-  -- Kitty motion
-  gh('knubie/vim-kitty-navigator'),
+  -- Terminal integration: kitty <C-hjkl> nav across nvim splits + kitty windows
+  gh('peopleskai/kitty-remote-session-navigator.nvim'),
 }
 
 -- NinjaHooks: Amazon Brazil Config LSP (conditional)
@@ -761,6 +761,11 @@ require('mini.statusline').setup({
     end,
   },
 })
+
+--------------------------------------------------------------------------------
+-- kitty <C-hjkl> window/pane motion (replaces vim-kitty-navigator)
+--------------------------------------------------------------------------------
+require('kitty-remote-session-navigator').setup()
 
 --------------------------------------------------------------------------------
 -- Plugin update keymap

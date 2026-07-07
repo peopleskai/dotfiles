@@ -122,6 +122,13 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
 #
+# ZMX setup
+#
+if command -v zmx &> /dev/null; then
+  eval "$(zmx completions zsh)"
+fi
+
+#
 # Generic Setup
 #
 
