@@ -120,7 +120,7 @@ require('todo-comments').setup()
 require('marks').setup()
 require('nvim-surround').setup({})
 require('nvim-autopairs').setup()
-require('fidget').setup()
+require('fidget').setup({})
 require('mason').setup()
 
 -- markdown-preview
@@ -147,9 +147,7 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- undotree
--- stylua: ignore start
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
--- stylua: ignore end
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undodir = os.getenv('HOME') .. '/.vim/undodir'
@@ -159,9 +157,9 @@ vim.opt.undofile = true
 vim.o.timeout = true
 vim.o.timeoutlen = 300
 require('which-key').setup()
--- stylua: ignore start
-vim.keymap.set('n', '<leader>?', function() require('which-key').show({ global = false }) end, { desc = 'Buffer Local Keymaps (which-key)' })
--- stylua: ignore end
+vim.keymap.set('n', '<leader>?', function()
+  require('which-key').show({ global = false })
+end, { desc = 'Buffer Local Keymaps (which-key)' })
 
 --------------------------------------------------------------------------------
 -- flash.nvim
@@ -172,19 +170,9 @@ require('flash').setup({
     char = { multi_line = false, highlight = { backdrop = false } },
   },
 })
--- stylua: ignore start
-vim.keymap.set('n', '<leader>/', function() require('flash').jump() end, { desc = 'Flash Jump' })
--- stylua: ignore end
-
--- Treesitter incremental selection
-vim.keymap.set({ 'n', 'x', 'o' }, '<c-space>', function()
-  require('flash').treesitter({
-    actions = {
-      ['<c-space>'] = 'next',
-      ['<BS>'] = 'prev',
-    },
-  })
-end, { desc = 'Treesitter incremental selection' })
+vim.keymap.set('n', '<leader>/', function()
+  require('flash').jump()
+end, { desc = 'Flash Jump' })
 
 --------------------------------------------------------------------------------
 -- gitsigns
@@ -263,9 +251,9 @@ end
 --------------------------------------------------------------------------------
 -- neogit
 --------------------------------------------------------------------------------
--- stylua: ignore start
-vim.keymap.set('n', '<leader>gs', function() require('neogit').open({ cwd = vim.fn.expand('%:p:h') }) end, { desc = '[G]it [S]tatus' })
--- stylua: ignore end
+vim.keymap.set('n', '<leader>gs', function()
+  require('neogit').open({ cwd = vim.fn.expand('%:p:h') })
+end, { desc = '[G]it [S]tatus' })
 
 --------------------------------------------------------------------------------
 -- conform.nvim
@@ -311,9 +299,9 @@ vim.api.nvim_create_user_command('FormatEnable', function()
   vim.g.disable_autoformat = false
 end, { desc = 'Re-enable autoformat-on-save' })
 
--- stylua: ignore start
-vim.keymap.set('', '<leader>Ff', function() require('conform').format({ async = true }) end, { desc = '[F]ormat [F]ile' })
--- stylua: ignore end
+vim.api.nvim_create_user_command('Format', function()
+  require('conform').format({ async = true })
+end, { desc = 'Format current buffer with conform' })
 
 --------------------------------------------------------------------------------
 -- nvim-lint
@@ -329,6 +317,7 @@ require('lint').linters_by_ft = {
 
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
   callback = function()
+    -- try_lint without arguments runs the linters defined in `linters_by_ft` for the current filetype
     require('lint').try_lint()
   end,
 })
@@ -351,7 +340,6 @@ require('mason-tool-installer').setup({
     'marksman',
     'pyright',
     'shfmt',
-    'stylua',
     'taplo',
     'isort',
     'black',
@@ -696,8 +684,8 @@ require('sidekick').setup({
     },
     tools = {
       claude_yolo = {
-        cmd = { "claude", "--dangerously-skip-permissions" },
-        name = "Claude YOLO",
+        cmd = { 'claude', '--dangerously-skip-permissions' },
+        name = 'Claude YOLO',
       },
       kiro = {
         cmd = { 'kiro-cli', 'chat', '--model', 'claude-opus-4.6', '--trust-all-tools' },
