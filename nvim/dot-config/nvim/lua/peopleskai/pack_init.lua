@@ -101,6 +101,9 @@ local plugins = {
   -- AI tools
   gh('folke/sidekick.nvim'),
 
+  -- Terminal
+  { src = gh('akinsho/toggleterm.nvim'), version = vim.version.range('2') },
+
   -- Terminal integration: kitty <C-hjkl> nav across nvim splits + kitty windows
   gh('peopleskai/kitty-remote-session-navigator.nvim'),
 }
@@ -650,12 +653,25 @@ vim.api.nvim_set_hl(0, '@punctuation.special.rust', { fg = '#ff9e64', bold = tru
 --------------------------------------------------------------------------------
 -- AI Tool sidekick setup
 --------------------------------------------------------------------------------
---- Toggle the sidekick CLI terminal between float and sidebar (right split).
---- sidekick has no runtime layout setter, so we flip opts.layout then hide/show
---- to re-open the window with the new layout, preserving focus.
+-- Transparency for floating terminals only (0 = opaque, higher = more transparent).
+local FLOAT_WINBLEND = 7
+
+-- winhighlight for the sidekick split and float window, overrides sidekick's
+-- default (which links to NormalFloat, a darker bg).
+local SIDEKICK_SPLIT_WINHL = ''
+local SIDEKICK_FLOAT_WINHL = 'Normal:SidekickChat,NormalNC:SidekickChat,EndOfBuffer:SidekickChat,SignColumn:SidekickChat'
+
+--- Toggle the sidekick CLI terminal between float and right split.
 ---@param t sidekick.cli.Terminal
 local function toggle_sidekick_layout(t)
-  t.opts.layout = t:is_float() and 'right' or 'float'
+  --- sidekick has no runtime layout setter, so we flip opts.layout then hide/show
+  --- to re-open the window with the new layout, preserving focus. winblend and
+  --- winhighlight are set for float vs split (sidekick uses a single wo table for
+  --- all layouts, so we drive them off the target layout here).
+  local to_float = not t:is_float()
+  t.opts.layout = to_float and 'float' or 'right'
+  t.opts.wo.winblend = to_float and FLOAT_WINBLEND or 0
+  t.opts.wo.winhighlight = to_float and SIDEKICK_FLOAT_WINHL or SIDEKICK_SPLIT_WINHL
   t:hide()
   t:show()
   vim.schedule(function()
@@ -668,9 +684,7 @@ require('sidekick').setup({
   cli = {
     win = {
       layout = 'right',
-      -- 0.93 opacity for both float and split (winblend is inverse of opacity;
-      -- no true blur is possible in a terminal UI).
-      wo = { winblend = 7 },
+      wo = { winblend = 0, winhighlight = SIDEKICK_SPLIT_WINHL },
       keys = {
         -- toggle between float and sidebar layouts
         toggle_layout = {
@@ -719,6 +733,64 @@ end, { desc = 'Sidekick Send {selection}' })
 vim.keymap.set({ 'n', 'x' }, '<leader>ap', function()
   require('sidekick.cli').prompt()
 end, { desc = 'Sidekick Select Prompt to Send' })
+
+--------------------------------------------------------------------------------
+-- toggleterm.nvim
+--------------------------------------------------------------------------------
+require('toggleterm').setup({
+  -- Horizontal (bottom) split gets 40% of screen height, mirroring the old
+  -- custom terminal; other directions fall back to a sane default.
+  size = function(term)
+    if term.direction == 'horizontal' then
+      return math.floor(vim.o.lines * 0.4)
+    end
+    return 20
+  end,
+  start_in_insert = true,
+  persist_size = true,
+  persist_mode = true,
+  -- Don't shade the terminal background
+  shade_terminals = false,
+  -- Apply winblend to float window
+  float_opts = {
+    winblend = FLOAT_WINBLEND,
+  },
+})
+
+-- Single persistent terminal (id 1) so <c-.> can grab a
+-- handle to flip its layout at runtime.
+local Terminal = require('toggleterm.terminal').Terminal
+local main_term = Terminal:new({
+  count = 1,
+  direction = 'horizontal',
+  on_open = function(t)
+    vim.cmd('startinsert')
+    -- Context-aware layout toggle: buffer-local to this terminal, so <c-,>
+    -- flips float<->bottom here while sidekick's own buffer-local <c-,> flips
+    -- float<->right in the sidekick CLI.
+    vim.keymap.set({ 'n', 't' }, '<c-,>', function()
+      local new_dir = t:is_float() and 'horizontal' or 'float'
+      t:close()
+      t:change_direction(new_dir)
+      t:open()
+      vim.cmd('startinsert')
+    end, { buffer = t.bufnr, desc = 'Toggleterm float <-> bottom split' })
+  end,
+})
+
+vim.keymap.set({ 'n', 't' }, '<c-`>', function()
+  main_term:toggle()
+end, { desc = 'Toggle terminal' })
+
+-- Kitty-aware <C-hjkl> window navigation from terminal-insert mode.
+for _, dir in ipairs({ 'h', 'j', 'k', 'l' }) do
+  vim.keymap.set('t', '<c-' .. dir .. '>', function()
+    require('kitty-remote-session-navigator').navigate(dir)
+  end, { silent = true, desc = 'Kitty-aware window nav from terminal (' .. dir .. ')' })
+end
+
+-- <C-q> keymap to leave terminal insert mode
+vim.keymap.set('t', '<c-q>', [[<C-\><C-n>]], { desc = 'Terminal: insert -> normal mode' })
 
 --------------------------------------------------------------------------------
 -- mini.statusline
