@@ -8,6 +8,7 @@ _startup.kitty-session used by kitty's startup_session directive.
 Config: watcher auto_save_session.py
 """
 
+import re
 import threading
 
 from pathlib import Path
@@ -44,7 +45,9 @@ def _save_all_sessions(boss: Boss):
         # Serialize each session independently, writing per-session files
         for name in names:
             opts = parse_save_as_options_spec_args([])[0]
-            opts.match = f"session:{name}"
+            # session: queries are unanchored regex searches, so "foo" would
+            # also match windows in session "foo-bar"; anchor to this session.
+            opts.match = f"session:^{re.escape(name)}$"
             opts.use_foreground_process = True
             lines = list(boss.serialize_state_as_session("", opts))
             if lines:
