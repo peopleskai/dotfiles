@@ -1,0 +1,10 @@
+{
+  "name": "claude-inline-comment-iteration",
+  "version": "0.1.0",
+  "description": "Resolve cc: / cc? / cc! inline feedback markers left in comments. code-iterate handles source files; doc-iterate handles Markdown/Obsidian notes. Both diff against the last pass to preserve manual edits and resolve markers with surgical edits, never whole-file rewrites.",
+  "author": {
+    "name": "Tony Yuen",
+    "url": "https://github.com/peopleskai/dotfiles"
+  },
+  "keywords": ["cc", "iterate", "code-review", "feedback-markers", "obsidian"]
+}

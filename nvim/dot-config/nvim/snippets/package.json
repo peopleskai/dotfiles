@@ -1,7 +1,54 @@
 {
   "contributes": {
     "snippets": [
-      { "language": "rust", "path": "./rust.json" }
+      { "language": "rust", "path": "./rust.json" },
+      {
+        "language": [
+          "rust",
+          "c",
+          "cpp",
+          "objc",
+          "cs",
+          "java",
+          "kotlin",
+          "scala",
+          "swift",
+          "dart",
+          "go",
+          "zig",
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "php",
+          "glsl",
+          "jsonc"
+        ],
+        "path": "./cc-slash.json"
+      },
+      {
+        "language": [
+          "python",
+          "sh",
+          "bash",
+          "zsh",
+          "fish",
+          "ruby",
+          "perl",
+          "awk",
+          "yaml",
+          "toml",
+          "make",
+          "cmake",
+          "dockerfile",
+          "gitconfig",
+          "gitignore",
+          "tmux",
+          "conf"
+        ],
+        "path": "./cc-hash.json"
+      },
+      { "language": ["lua", "sql", "haskell", "elm", "ada"], "path": "./cc-dash.json" }
     ]
   }
 }

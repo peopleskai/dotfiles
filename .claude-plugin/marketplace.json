@@ -1,0 +1,17 @@
+{
+  "name": "peopleskai-dotfiles",
+  "owner": {
+    "name": "Tony Yuen",
+    "url": "https://github.com/peopleskai/dotfiles"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugins bundled with peopleskai/dotfiles."
+  },
+  "plugins": [
+    {
+      "name": "claude-inline-comment-iteration",
+      "source": "./claude-plugins/claude-inline-comment-iteration",
+      "description": "Resolve cc: / cc? / cc! inline feedback markers in source files (code-iterate) and Markdown notes (doc-iterate) without clobbering manual edits."
+    }
+  ]
+}
