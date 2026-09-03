@@ -1,0 +1,4 @@
+# Machine-local configuration: internal tooling, host paths, local workarounds.
+# Copy lua/machine_local.example.lua to create it. Never commit it — this repo
+# is public.
+lua/machine_local.lua

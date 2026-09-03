@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
 -- toggleterm.nvim
 --------------------------------------------------------------------------------
+local util = require('peopleskai.plugins.util')
 -- Transparency for floating terminals only (0 = opaque, higher = more transparent).
-local FLOAT_WINBLEND = require('peopleskai.plugins.util').FLOAT_WINBLEND
+local FLOAT_WINBLEND = util.FLOAT_WINBLEND
 
 require('toggleterm').setup({
   -- Horizontal (bottom) split gets 40% of screen height, mirroring the old
@@ -37,6 +38,11 @@ local main_term = Terminal:new({
     -- float<->right in the sidekick CLI.
     vim.keymap.set({ 'n', 't' }, '<c-,>', function()
       local new_dir = t:is_float() and 'horizontal' or 'float'
+      -- Two overlapping floats are useless: if we're flipping into float,
+      -- close any sidekick float first (see util.hide_sidekick_floats).
+      if new_dir == 'float' then
+        util.hide_sidekick_floats()
+      end
       t:close()
       t:change_direction(new_dir)
       t:open()
@@ -46,6 +52,11 @@ local main_term = Terminal:new({
 })
 
 vim.keymap.set({ 'n', 't' }, '<c-`>', function()
+  -- If we're about to open the terminal as a float, close any sidekick float
+  -- first so the two don't stack on top of each other.
+  if not main_term:is_open() and main_term.direction == 'float' then
+    util.hide_sidekick_floats()
+  end
   main_term:toggle()
 end, { desc = 'Toggle terminal' })
 

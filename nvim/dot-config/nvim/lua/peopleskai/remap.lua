@@ -22,7 +22,9 @@ vim.keymap.set('v', '<leader>y', '"+y', { desc = '[Y]ank selection to system cli
 vim.keymap.set('n', '<leader>Y', '"+Y', { desc = '[Y]ank line to system clipboard' })
 
 -- Delete to void register
-vim.keymap.set('n', '<leader>d', '"_d', { desc = '[D]elete line without copy' })
+-- Normal mode lives under <leader>dl (not bare <leader>d) so it doesn't shadow
+-- the other <leader>d* maps (dt/dm/dh) with an operator-pending wait.
+vim.keymap.set('n', '<leader>dl', '"_dd', { desc = '[D]elete [L]ine without copy' })
 vim.keymap.set('v', '<leader>d', '"_d', { desc = '[D]elete selection without copy' })
 vim.keymap.set('v', '<leader>D', '"_D', { desc = '[D]elete rest of line without copy' })
 

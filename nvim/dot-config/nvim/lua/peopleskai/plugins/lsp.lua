@@ -101,26 +101,6 @@ blink.setup({
 -- blink.get_lsp_capabilities() is used below to advertise completion
 -- capabilities to every LSP server.
 
--- bemol: gathers bemol-generated workspace folders for Kotlin LSP
-local function bemol()
-  local bemol_dir = vim.fs.find({ '.bemol' }, { upward = true, type = 'directory' })[1]
-  local ws_folders_lsp = {}
-  if bemol_dir then
-    local file = io.open(bemol_dir .. '/ws_root_folders', 'r')
-    if file then
-      for line in file:lines() do
-        table.insert(ws_folders_lsp, line)
-      end
-      file:close()
-    end
-    for _, line in ipairs(ws_folders_lsp) do
-      if not vim.tbl_contains(vim.lsp.buf.list_workspace_folders(), line) then
-        vim.lsp.buf.add_workspace_folder(line)
-      end
-    end
-  end
-end
-
 -- LSP server configs (vim.lsp.config / vim.lsp.enable, nvim 0.11+)
 local servers = {
   lua_ls = {
@@ -130,7 +110,7 @@ local servers = {
     settings = { Lua = { completion = { callSnippet = 'Replace' } } },
   },
   clangd = {
-    cmd = { 'clangd', '--background-index', '--query-driver="/usr/local/bin/arm-none-eabi-gcc"' },
+    cmd = { 'clangd', '--background-index', '--query-driver=/usr/local/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc' },
     filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
     root_markers = { '.clangd', 'compile_commands.json', '.git' },
   },
@@ -154,15 +134,15 @@ local servers = {
     cmd = { os.getenv('HOME') .. '/lsp/kotlin-language-server-1-3-3/bin/kotlin-language-server' },
     filetypes = { 'kotlin' },
     root_markers = { 'settings.gradle', 'settings.gradle.kts', 'build.gradle', 'build.gradle.kts', '.git' },
-    on_attach = function()
-      bemol()
-    end,
   },
 }
 
 if vim.loop.os_uname().sysname == 'Darwin' then
   servers.sourcekit = { cmd = { 'sourcekit-lsp' }, filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' }, root_markers = { 'Package.swift', '.git' } }
 end
+
+-- Machine-local servers and amendments (internal LSPs, workspace discovery).
+require('peopleskai.machine').call('lsp_servers', servers)
 
 local servers_to_enable = {}
 for name, config in pairs(servers) do
@@ -178,29 +158,3 @@ vim.lsp.enable(servers_to_enable)
 -- lazydev.nvim to configure Lua LS
 --------------------------------------------------------------------------------
 require('lazydev').setup({})
-
---------------------------------------------------------------------------------
--- NinjaHooks (Amazon Brazil Config LSP — conditional)
---------------------------------------------------------------------------------
-if os.getenv('WORK_ENV') ~= nil then
-  -- Find the NinjaHooks plugin path
-  local nh = vim.pack.get({ 'NinjaHooks' })
-  if nh and nh[1] then
-    local plugin_dir = nh[1].path
-    vim.opt.rtp:prepend(plugin_dir .. '/configuration/vim/amazon/brazil-config')
-    vim.filetype.add({
-      filename = {
-        ['Config'] = function()
-          vim.b.brazil_package_Config = 1
-          return 'brazil-config'
-        end,
-      },
-    })
-    vim.lsp.config('barium', {
-      cmd = { 'barium' },
-      filetypes = { 'brazil-config' },
-      root_markers = { '.git' },
-    })
-    vim.lsp.enable('barium')
-  end
-end

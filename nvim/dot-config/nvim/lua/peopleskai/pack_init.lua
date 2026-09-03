@@ -19,6 +19,12 @@ vim.api.nvim_create_autocmd('PackChanged', {
       vim.system({ 'yarn', 'install' }, { cwd = path .. '/app' })
     elseif name == 'telescope-fzf-native.nvim' then
       vim.system({ 'make' }, { cwd = path })
+    elseif name == 'fff' then
+      -- Fetches the prebuilt Rust binary for this tag, falling back to `cargo build --release`.
+      if not ev.data.active then
+        vim.cmd.packadd('fff')
+      end
+      require('fff.download').download_or_build_binary()
     elseif name == 'nvim-treesitter' then
       if not ev.data.active then
         vim.cmd.packadd('nvim-treesitter')
@@ -45,11 +51,13 @@ local plugins = {
   gh('j-hui/fidget.nvim'),
   gh('folke/which-key.nvim'),
 
+  -- Snacks (undo picker, git pickers, lazygit)
+  gh('folke/snacks.nvim'),
+
   -- Editor enhancements
   gh('tpope/vim-sleuth'),
   gh('folke/todo-comments.nvim'),
   gh('chentoast/marks.nvim'),
-  gh('mbbill/undotree'),
   { src = gh('kylechui/nvim-surround'), version = vim.version.range('3.0') },
   gh('windwp/nvim-autopairs'),
   gh('windwp/nvim-ts-autotag'),
@@ -63,17 +71,18 @@ local plugins = {
   gh('sindrets/diffview.nvim'),
 
   -- Fuzzy finders
+  { src = gh('dmtrKovalenko/fff'), version = 'v0.10.5' },
   gh('nvim-telescope/telescope-fzf-native.nvim'),
   gh('nvim-telescope/telescope-file-browser.nvim'),
-  gh('nvim-telescope/telescope-live-grep-args.nvim'),
   gh('nvim-telescope/telescope.nvim'),
-
-  -- Git client (after telescope)
-  gh('NeogitOrg/neogit'),
 
   -- Formatting & Linting
   gh('stevearc/conform.nvim'),
   gh('mfussenegger/nvim-lint'),
+  -- Format only the lines changed vs the VCS index (needs plenary). Used for
+  -- c/cpp via clangd, where whole-file formatting of the vendored QEMU tree
+  -- would produce unreviewable diffs.
+  gh('joechrisellis/lsp-format-modifications.nvim'),
 
   -- LSP
   gh('williamboman/mason.nvim'),
@@ -105,15 +114,24 @@ local plugins = {
 
   -- Terminal
   { src = gh('akinsho/toggleterm.nvim'), version = vim.version.range('2') },
-
-  -- Terminal integration: kitty <C-hjkl> nav across nvim splits + kitty windows
-  gh('peopleskai/kitty-remote-session-navigator.nvim'),
 }
 
--- NinjaHooks: Amazon Brazil Config LSP (conditional)
-if os.getenv('WORK_ENV') ~= nil then
-  table.insert(plugins, { src = 'yuenton@git.amazon.com:pkg/NinjaHooks', version = 'mainline' })
+-- Terminal integration: kitty <C-hjkl> nav across nvim splits + kitty windows.
+-- Prefer a local checkout (live edits, no vim.pack update needed); fall back to GitHub.
+local krsn_local = vim.fn.expand('~/repos/kitty-remote-session-navigator.nvim')
+if vim.uv.fs_stat(krsn_local .. '/lua') then
+  vim.opt.runtimepath:prepend(krsn_local)
+else
+  table.insert(plugins, gh('peopleskai/kitty-remote-session-navigator.nvim'))
 end
+
+--------------------------------------------------------------------------------
+-- Machine-local configuration (optional, gitignored). Holds host- and
+-- employer-specific bits so this repo stays portable; see
+-- lua/machine_local.example.lua for the hook contract.
+--------------------------------------------------------------------------------
+local machine_local = require('peopleskai.machine')
+machine_local.call('plugins', plugins)
 
 vim.pack.add(plugins)
 
@@ -127,8 +145,11 @@ vim.cmd([[colorscheme tokyonight-night]])
 for _, mod in ipairs({
   'peopleskai.plugins.ui',
   'peopleskai.plugins.editor',
+  -- snacks before git: git.lua keymaps call the Snacks global
+  'peopleskai.plugins.snacks',
   'peopleskai.plugins.git',
   'peopleskai.plugins.telescope',
+  'peopleskai.plugins.fff',
   'peopleskai.plugins.format_lint',
   'peopleskai.plugins.lsp',
   'peopleskai.plugins.rust',
@@ -138,6 +159,10 @@ for _, mod in ipairs({
 }) do
   require(mod)
 end
+
+-- Machine-local late setup: runs after every plugin config, so it can amend
+-- plugin state (see lua/machine_local.example.lua).
+machine_local.call('setup')
 
 --------------------------------------------------------------------------------
 -- Plugin update command

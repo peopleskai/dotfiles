@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__kuiper-confluence-tool__kuiper_confluence_search_pages",
+      "mcp__kuiper-confluence-tool__kuiper_confluence_get_page_content",
+      "mcp__builder-mcp__InternalCodeSearch",
+      "mcp__builder-mcp__ReadInternalWebsites"
+    ]
+  }
+}

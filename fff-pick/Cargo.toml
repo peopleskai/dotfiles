@@ -1,0 +1,15 @@
+[package]
+name = "fff-pick"
+version = "0.1.0"
+edition = "2024"
+description = "Interactive shell file picker backed by the fff search engine"
+license = "MIT"
+
+[dependencies]
+crossterm = "0.29"
+fff-search = "0.10"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

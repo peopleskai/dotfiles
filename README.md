@@ -42,4 +42,32 @@ stow -D --dotfiles -t $HOME nvim
 ```
 Just like the setup, you can replace the `nvim` argument with any of the already setup subfolders to remove symlinks created to the subfolders.
 
+### fff-pick
+
+`fff-pick` is not a stow package -- it is a small Rust binary that puts the
+[fff](https://github.com/dmtrKovalenko/fff) engine behind a shell file picker,
+sharing its frecency database with `fff.nvim`. It is **parked**: `CTRL-T` in zsh
+is still fzf. Kept in working order in case it is worth revisiting.
+
+See [fff-pick/README.md](fff-pick/README.md) for how fff is actually
+architected (no daemon, index per process), the measured scan costs that led to
+parking it, and how to re-enable the `CTRL-T` binding.
+
+### Claude Code plugins
+
+`claude-plugins/` is not a stow package -- it holds Claude Code plugins, and this
+repo doubles as a plugin marketplace (`.claude-plugin/marketplace.json`).
+
+- **claude-inline-comment-iteration** -- `code-iterate` / `doc-iterate` skills that
+  resolve `cc:` / `cc?` / `cc!` inline feedback markers left in source comments and
+  Markdown notes. Pairs with the `cc-*` nvim snippets in
+  `nvim/dot-config/nvim/snippets/`.
+
+Install:
+```
+claude plugin marketplace add peopleskai/dotfiles
+claude plugin install claude-inline-comment-iteration@peopleskai-dotfiles
+```
+See [claude-plugins/claude-inline-comment-iteration/README.md](claude-plugins/claude-inline-comment-iteration/README.md).
+
 ## Additional Setup for specific programs

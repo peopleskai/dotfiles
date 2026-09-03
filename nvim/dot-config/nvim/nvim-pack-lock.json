@@ -10,7 +10,8 @@
     },
     "NinjaHooks": {
       "rev": "1640bc31db4679eb2a03dc4d4373defd37102ff5",
-      "src": "yuenton@git.amazon.com:pkg/NinjaHooks"
+      "src": "yuenton@git.amazon.com:pkg/NinjaHooks",
+      "version": "'mainline'"
     },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
@@ -49,6 +50,11 @@
       "rev": "2d7c2db2507fa3c4956142ee607431ddb2828639",
       "src": "https://github.com/stevearc/dressing.nvim"
     },
+    "fff": {
+      "rev": "459ebcdbdba094843fe5339a1a7f7dae4ced2d82",
+      "src": "https://github.com/dmtrKovalenko/fff",
+      "version": "'v0.10.5'"
+    },
     "fidget.nvim": {
       "rev": "889e2e96edef4e144965571d46f7a77bcc4d0ddf",
       "src": "https://github.com/j-hui/fidget.nvim"
@@ -84,6 +90,10 @@
     "lazydev.nvim": {
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
       "src": "https://github.com/folke/lazydev.nvim"
+    },
+    "lsp-format-modifications.nvim": {
+      "rev": "1b307ec983f5e312d2ad9ff22b5e8084afea848f",
+      "src": "https://github.com/joechrisellis/lsp-format-modifications.nvim"
     },
     "lualine.nvim": {
       "rev": "a905eeebc4e63fdc48b5135d3bf8aea5618fb21c",

@@ -27,9 +27,8 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 --------------------------------------------------------------------------------
--- undotree
+-- persistent undo (history browsed with Snacks.picker.undo, see snacks.lua)
 --------------------------------------------------------------------------------
-vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undodir = os.getenv('HOME') .. '/.vim/undodir'

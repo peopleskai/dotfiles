@@ -13,20 +13,5 @@
     "prefix": "ccb",
     "body": ["# cc! $1", "$0"],
     "description": "cc marker: blocking — must resolve"
-  },
-  "cc general note": {
-    "prefix": "ccgn",
-    "body": ["# cc*: $1", "$0"],
-    "description": "cc marker: file-level note"
-  },
-  "cc general question": {
-    "prefix": "ccgq",
-    "body": ["# cc*? $1", "$0"],
-    "description": "cc marker: file-level question"
-  },
-  "cc general blocker": {
-    "prefix": "ccgb",
-    "body": ["# cc*! $1", "$0"],
-    "description": "cc marker: file-level blocking"
   }
 }
