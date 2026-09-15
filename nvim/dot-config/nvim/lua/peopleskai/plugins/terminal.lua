@@ -6,6 +6,8 @@ local util = require('peopleskai.plugins.util')
 local FLOAT_WINBLEND = util.FLOAT_WINBLEND
 
 require('toggleterm').setup({
+  -- Start a login shell so ~/.zprofile is loaded before ~/.zshrc.
+  shell = 'zsh -l',
   -- Horizontal (bottom) split gets 40% of screen height, mirroring the old
   -- custom terminal; other directions fall back to a sane default.
   size = function(term)
