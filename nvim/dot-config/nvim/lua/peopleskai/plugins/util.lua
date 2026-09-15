@@ -31,12 +31,13 @@ end
 --- Whether toggling sidekick would open it as a float. True when an attached
 --- session exists that is currently hidden and configured for the float layout
 --- (the case where a toggle would pop a float on top of a toggleterm float).
-function M.sidekick_will_open_float()
+---@param filter? sidekick.cli.Filter
+function M.sidekick_will_open_float(filter)
   local ok, State = pcall(require, 'sidekick.cli.state')
   if not ok then
     return false
   end
-  for _, state in ipairs(State.get({ attached = true })) do
+  for _, state in ipairs(State.get(vim.tbl_extend('force', filter or {}, { attached = true }))) do
     local term = state.terminal
     if term and not term:is_open() and term:is_float() then
       return true

@@ -55,28 +55,37 @@ require('sidekick').setup({
         cmd = { 'claude', '--dangerously-skip-permissions' },
         name = 'Claude YOLO',
       },
-      claude_fable_yolo = {
-        cmd = { 'claude-fable', '--dangerously-skip-permissions' },
-        name = 'Fable YOLO',
-      },
-      kiro = {
-        cmd = { 'kiro-cli', 'chat', '--model', 'claude-opus-4.6', '--trust-all-tools' },
-        name = 'KiroCLI',
-      },
-      kiro_sisyphus = {
-        cmd = { 'kiro-cli', 'chat', '--agent', 'sisyphus', '--trust-all-tools' },
-        name = 'KiroCLI Sisyphus',
+      codex_yolo = {
+        cmd = { 'codex', '--aws-profile', 'yuenton-dev-kuiper', '--dangerously-bypass-approvals-and-sandbox' },
+        name = 'Codex YOLO',
       },
     },
   },
 })
+
+--- Target the most recently focused terminal, including hidden ones.
+--- An empty filter lets Sidekick offer its picker when no terminal is attached.
+---@return sidekick.cli.Filter
+local function sidekick_recent_filter()
+  ---@type sidekick.cli.Terminal?
+  local recent
+  for _, state in ipairs(require('sidekick.cli.state').get({ attached = true, terminal = true })) do
+    local term = state.terminal
+    if term and (not recent or term.atime > recent.atime) then
+      recent = term
+    end
+  end
+  return recent and { session = recent.id } or {}
+end
+
 --- Toggle sidekick, first closing any toggleterm float if this toggle would
 --- open sidekick as a float (so the two floats don't stack on top of each other).
 local function sidekick_toggle()
-  if util.sidekick_will_open_float() then
+  local filter = sidekick_recent_filter()
+  if util.sidekick_will_open_float(filter) then
     util.close_toggleterm_floats()
   end
-  require('sidekick.cli').toggle('claude_yolo')
+  require('sidekick.cli').toggle({ filter = filter })
 end
 vim.keymap.set({ 'n', 't', 'i', 'x' }, '<c-.>', sidekick_toggle, { desc = 'Sidekick Toggle' })
 vim.keymap.set('n', '<leader>aa', sidekick_toggle, { desc = 'Sidekick Toggle' })
@@ -84,16 +93,23 @@ vim.keymap.set('n', '<leader>as', function()
   require('sidekick.cli').select()
 end, { desc = 'Sidekick Select CLI' })
 vim.keymap.set({ 'n', 'x' }, '<leader>at', function()
-  require('sidekick.cli').send({ name = 'claude_yolo', msg = '{this}' })
+  require('sidekick.cli').send({ filter = sidekick_recent_filter(), msg = '{this}' })
 end, { desc = 'Sidekick Send {this}' })
 vim.keymap.set('n', '<leader>af', function()
-  require('sidekick.cli').send({ name = 'claude_yolo', msg = '{file}' })
+  require('sidekick.cli').send({ filter = sidekick_recent_filter(), msg = '{file}' })
 end, { desc = 'Sidekick Send {file}' })
 vim.keymap.set('x', '<leader>av', function()
-  require('sidekick.cli').send({ name = 'claude_yolo', msg = '{selection}' })
+  require('sidekick.cli').send({ filter = sidekick_recent_filter(), msg = '{selection}' })
 end, { desc = 'Sidekick Send {selection}' })
 vim.keymap.set({ 'n', 'x' }, '<leader>ap', function()
-  require('sidekick.cli').prompt()
+  local cli = require('sidekick.cli')
+  cli.prompt({
+    cb = function(_, text)
+      if text then
+        cli.send({ filter = sidekick_recent_filter(), text = text })
+      end
+    end,
+  })
 end, { desc = 'Sidekick Select Prompt to Send' })
 
 --------------------------------------------------------------------------------
