@@ -42,6 +42,12 @@ require('snacks').setup({
     -- Generates a lazygit theme from the active colorscheme and makes lazygit's
     -- editor open files back in this nvim instance.
     configure = true,
+    config = {
+      os = {
+        -- Make "open file" (o) use Neovim too, matching the nvim-remote edit preset.
+        open = [[nvim --server "$NVIM" --remote-send "q" && nvim --server "$NVIM" --remote-tab {{filename}}]],
+      },
+    },
   },
 })
 
